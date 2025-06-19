@@ -1,5 +1,6 @@
 import React , { useState, useEffect } from 'react';
 import { API_BASE_URL, getToken} from '../ApiConfig/ApiConfig';
+import {useNavigate} from 'react-router-dom';
 
 
 const member = {
@@ -42,6 +43,7 @@ const member = {
 
 const ProfilePage = () => {
     const [member, setMember] = useState({});
+    const navigate = useNavigate();
     useEffect(() => {
       const fetchMemberDetails = async () => {
         try {
@@ -55,22 +57,23 @@ const ProfilePage = () => {
             }
           );
           const data = await response.json();
-          setMember(data);
+          setMember(data.user);
+          console.log(data.user);
         } catch (error) {
           console.error('Error fetching member details:', error);
         }
       };
   
       fetchMemberDetails();
-    })
+    }, []);
   return (
     <React.Fragment>
             <div className="page-content">
                <div className='page-title-box d-sm-flex align-items-center justify-content-between'>
               <h4 className="mb-0">Profile</h4>
-              {/* <button type="button" className="btn btn-success waves-effect waves-light"  onClick={()=> navigate('/membersadd') }>
-                  <i className="fas fa-plus align-middle me-2"></i> Add 
-              </button> */}
+              <button type="button" className="btn btn-success waves-effect waves-light"  onClick={()=> navigate(`/employeedit/${member.employeeid_encpt}`) }>
+                  <i className="fas fa-edit align-middle me-2"></i> Edit 
+              </button>
           </div>
     <div className="container ">
       <div className="card shadow-lg">
@@ -81,20 +84,20 @@ const ProfilePage = () => {
                 <img
                         src={
                             member.image
-                            ? `${process.env.REACT_APP_APIURL}storage/uploads/${member.image}`
-                            : "https://i.pravatar.cc/150?img=5"
+                            ? `${member.image}`
+                            : ""
                         }
                         alt="profile"
                         className="rounded-circle img-fluid mb-3"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                             e.target.onerror = null;
-                            e.target.src = "https://i.pravatar.cc/150?img=5";
+                            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
                         }}
                         />
               <h4>{member.name} {member.surname}</h4>
               <p className="text-muted">{member.designation}</p>
-              <span className="badge bg-primary">Member ID: {member.employeeid}</span>
+              <span className="badge bg-primary">Employee ID: {member.employeeid}</span>
             </div>
 
             {/* Right: Details */}

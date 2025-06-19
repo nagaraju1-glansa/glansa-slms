@@ -21,10 +21,11 @@ import { Link, useParams , useNavigate} from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { CustomFetch } from "../ApiConfig/CustomFetch";
 import Swal from "sweetalert2";
+import { RoleId } from '../ApiConfig/ApiConfig';
 
 const EmployeeAdd = () => {
   const [breadcrumbItems] = useState([
-    { title: "Employee List", link: "/members" },
+    { title: "Employee Registration", link: "/members" },
     { title: "Add", link: "#" },
   ]);
   const [activeTab, setActiveTab] = useState(1);
@@ -52,17 +53,21 @@ const EmployeeAdd = () => {
      ifsccode: "",
      acntname: "",
      bankname: "",
-     status: 1
+     status: 1,
+     email: "",
 
   });
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null);
   const [errors, setErrors] = useState({});
+  const [roles, setRoles] = useState([]);
 
   const [sameAsCurrent, setSameAsCurrent] = useState(false);
+  const roleId = RoleId();
 
   // Fetch data for the existing member if `id` exists in the URL
   useEffect(() => {
+          fetchRoles();
     if (id) {
       const fetchData = async () => {
         try {
@@ -77,11 +82,20 @@ const EmployeeAdd = () => {
         }
       };
       fetchData();
+
     }
     else{
       setFormData({});
     }
   }, [id]);
+
+
+  const fetchRoles = async () => {
+          const res = await CustomFetch('/roles');
+          const data = await res.json();
+          setRoles(data);
+      };
+  
 
   const toggleTab = (tab) => {
     if (activeTab !== tab && tab >= 1 && tab <= 4) {
@@ -220,13 +234,16 @@ const handleInput = (e) => {
           confirmButtonText: 'OK',
         })
         setPreview('');
-        navigate('/employees');
+        roleId == 3 ? navigate('/profile') :  navigate('/employees');
+
       }
       else{
         // alert(data.error);
         Swal.fire({
           title: 'Error',
-          text: data.error || 'Something went wrong',
+          html: data.errors
+            ? Object.values(data.errors).map(errArr => errArr.join('<br>')).join('<br><hr>')
+            : 'Something went wrong',
           icon: 'error',
         })
       }
@@ -498,9 +515,14 @@ const handleInput = (e) => {
                                   onChange={handleInput}
                                 >
                                   <option value="">--Select Role--</option>
-                                  <option value="2">Admin</option>
+                                  {roles && roles.map((role) => (
+                                    <option key={role.id} value={role.id}>
+                                      {role.name}
+                                    </option>
+                                  ))}
+                                  {/* <option value="2">Admin</option>
                                   <option value="3">Manager</option>
-                                  <option value="4">Employee</option>
+                                  <option value="4">Employee</option> */}
                                   {/* <option value="Secretary">Secretary</option>
                                   <option value="Vice President">Vice President</option>
                                   <option value="President">President</option> */}

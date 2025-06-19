@@ -21,7 +21,7 @@ const rootReducer = combineReducers({
 
     // public
     Layout,
-
+    
     // Authentication
     Account,
     Login,

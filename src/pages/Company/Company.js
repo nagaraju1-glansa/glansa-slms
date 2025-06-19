@@ -48,11 +48,11 @@ const Company = () => {
   const [formData, setFormData] = useState({
     company_id: "",
     name: "",
-    min_saving: "",
-    admission_fee: "",
-    form_fee: "",
-    loan_eligibility: "",
-    eligibility_amount: "",
+    min_saving: "100",
+    admission_fee: "150",
+    form_fee: "5",
+    loan_eligibility: "12",
+    eligibility_amount: "3",
    status: '1',
     date: "",
   });
@@ -169,22 +169,23 @@ const Company = () => {
                       <Input name="name" value={formData.name} onChange={handleChange} required />
 
                       <Label className="mt-2">Minimum Saving</Label>
-                      <Input name="min_saving" type="number" value={formData.min_saving} onChange={handleChange} required />
+                      <Input name="min_saving" type="number" min={1} value={formData.min_saving} onChange={handleChange} required />
 
                       <Label className="mt-2">Admission Fee</Label>
-                      <Input name="admission_fee" type="number" value={formData.admission_fee} onChange={handleChange} required />
+                      <Input name="admission_fee" type="number" min={1} value={formData.admission_fee} onChange={handleChange} required />
 
                       <Label className="mt-2">Form Fee</Label>
-                      <Input name="form_fee" type="number" value={formData.form_fee} onChange={handleChange} required />
+                      <Input name="form_fee" type="number" min={1} value={formData.form_fee} onChange={handleChange} required />
 
-                      <Label className="mt-2">Loan Eligibility</Label>
-                      <Input name="loan_eligibility" value={formData.loan_eligibility} onChange={handleChange} required />
+                      <Label className="mt-2">Loan Eligibility (In Months)</Label>
+                      <Input name="loan_eligibility" type="number" min={1} value={formData.loan_eligibility} onChange={handleChange} required />
 
-                      <Label className="mt-2">Eligibility Amount</Label>
-                      <Input name="eligibility_amount" type="number" value={formData.eligibility_amount} onChange={handleChange} required />
+                      <Label className="mt-2">Loan Eligibility Amount (No of times) </Label>
+                      <Input name="eligibility_amount" type="number" min={1} value={formData.eligibility_amount} onChange={handleChange} required />
+                      <span className="text-muted">Note: Total Savings * No (EX : 1000 * 3)</span><br></br>
 
                       <Label className="mt-2">Status</Label>
-                      <Input type="select" name="status" value={formData.status} onChange={handleChange} required >
+                      <Input type="select" name="status" value={formData.status} onChange={handleChange} required style={{ height: "40px" }}>
                         <option value="1">Active</option>
                         <option value="0">Inactive</option>
                       </Input>

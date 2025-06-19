@@ -14,6 +14,7 @@ import { CustomFetch } from "../ApiConfig/CustomFetch";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import ReceiptPrint from "./ReceiptPrint";
 
 const ReceiptsAdd = () => {
   const [breadcrumbItems] = useState([
@@ -29,6 +30,10 @@ const ReceiptsAdd = () => {
   const [paymentOptions, setPaymentOptions] = useState([]);
   const [transactionOptions, setTransactionOptions] = useState([]);
   const [loanTypeOptions, setLoanTypeOptions] = useState([]);
+
+  const [receiptData, setReceiptData] = useState(null);
+const [showReceiptModal, setShowReceiptModal] = useState(false);
+
 const initialState = {
     receipt_date: today,
     amount: '0',
@@ -44,9 +49,10 @@ const initialState = {
     modeofrepayment: '0',
     towardscode: '',
     trantypecode: '',
-    mno: null,
+    mno: '',
     membername: '',
     lastpaiddate: '',
+    m_no: '',
   };
   const [formData, setFormData] = useState(initialState);
 
@@ -81,6 +87,7 @@ const initialState = {
     value: item.m_no_encpt,
     label: item.m_no,
     membername: item.name,
+    image: item.image
   }));
 
   const handleMNoChange = (selectedOption) => {
@@ -89,6 +96,7 @@ const initialState = {
       ...prev,
       mno: selectedOption,
       membername: selectedOption.membername || '',
+      image: selectedOption.image
     }));
     setSelectedMno(selectedOption);
     
@@ -177,11 +185,9 @@ total = amount + latefee + interest;
   };
 
   const getCompanyAmount = (id) => {
-      CustomFetch(`/getcompany`)
+      CustomFetch(`/getcompany?towardscode=${id}&m_no=${formData.mno?.value || null}`)
       .then((res) => res.json())
       .then((data) => {
-          //   console.log(formData.towardscode);
-          // console.log(data.length);
 
         if (data) {
           console.log(formData.towardscode);
@@ -191,6 +197,8 @@ total = amount + latefee + interest;
             setFormData((prev) => ({
               ...prev,
               amount: data.min_saving || '100',
+              latefee: data.late_fee || '0',
+              lastpaiddate: data.lastpaiddate || '',
             }));
           }
           if(id == '48'){
@@ -342,7 +350,7 @@ total = amount + latefee + interest;
     return valid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =  async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -360,6 +368,27 @@ total = amount + latefee + interest;
                 return false;
               }
 
+
+              // Confirm formData before submission
+  const confirmation = await Swal.fire({
+    title: 'Confirm Submission',
+    html: `
+    <div style="text-align: left; font-size: 16px;">
+      <p><strong>Member No:</strong> ${formData.mno?.label || 'N/A'}</p>
+      <p><strong>Member Name:</strong> ${formData.mno?.membername || 'N/A'}</p>
+      <p><strong>Towards:</strong> ${formData.towards || 'N/A'}</p>
+      <p><strong>Total Amount:</strong> ₹${formData.totalamount || '0.00'}</p>
+    </div>
+  `,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Submit',
+    cancelButtonText: 'Cancel',
+    width: '600px',
+  });
+
+  if (!confirmation.isConfirmed) return;
+
     CustomFetch("/addreceipts", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -367,20 +396,25 @@ total = amount + latefee + interest;
       .then((res) => res.json())
       .then((data) => {
        if (data.success) {
-            Swal.fire({
-              title: 'Success!',
-              text: data?.data?.message || 'Receipt added successfully.',
-              icon: 'success',
-              confirmButtonText: 'OK',
-            }).then((result) => {
-              if (result.isConfirmed) {
-                if (formData.towardscode === '47') {
-                  navigate('/loanreceipts');
-                } else {
-                  navigate('/savingreceipts');
+            // Swal.fire({
+            //   title: 'Success!',
+            //   text: data?.data?.message || 'Receipt added successfully.',
+            //   icon: 'success',
+            //   confirmButtonText: 'OK',
+            // }).then((result) => {
+
+               if (data.success) {
+                  setReceiptData(data.receipt); // Replace with actual receipt format from response
+                  setShowReceiptModal(true);
                 }
-              }
-            });
+              // if (result.isConfirmed) {
+              //   if (formData.towardscode === '47') {
+              //     navigate('/loanreceipts');
+              //   } else {
+              //     navigate('/savingreceipts');
+              //   }
+              // }
+            // });
           }
 
         else{
@@ -401,6 +435,7 @@ total = amount + latefee + interest;
     setFormData(initialState);
     setSelectedMno(null);
     setErrors({});
+    
   };
 
   return (
@@ -413,7 +448,22 @@ total = amount + latefee + interest;
             <Col lg="12">
               <Card>
                 <CardBody>
-                  <h4 className="card-title mb-4">Receipts Details</h4>
+                  <div className='page-title-box d-sm-flex align-items-center justify-content-between'>
+                      <h4 className="mb-0">Receipts Details</h4>
+                     <img
+                        src={formData.image ? `${formData.image}` : ""}
+                        alt="profile"
+                        className="rounded-circle img-fluid mb-3"
+                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                        onError={e => {
+                          e.target.onerror = null;
+                          e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                        }}
+                      />
+                  </div>
+
+                  
+
                   <Form onSubmit={handleSubmit}>
                     <Row className="mb-3">
                       <Col md={6}>
@@ -429,11 +479,12 @@ total = amount + latefee + interest;
 
                         <Label className="mt-3">Select M.no</Label>
                         <Select
-                          value={formData.m_no}
-                          name="m_no"
+                          value={formData.mno}
+                          name="mno"
                           onChange={handleMNoChange}
                           options={optionsSelect}
                           classNamePrefix="select2-selection"
+                          isClearable
                         />
                         {errors.mno && <div className="text-danger">{errors.mno}</div>}
 
@@ -695,6 +746,11 @@ total = amount + latefee + interest;
               </Card>
             </Col>
           </Row>
+          <ReceiptPrint
+            receiptData={receiptData}
+            show={showReceiptModal}
+            onClose={() => setShowReceiptModal(false)}
+          />
         </Container>
       </div>
     </React.Fragment>

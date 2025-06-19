@@ -19,8 +19,8 @@ import { useForm, Controller } from 'react-hook-form';
 
 const CompanyDashboard = () => {
     const [breadcrumbItems] = useState([
-        { title: "GLANSA SLMS", link: "/" },
-        { title: "Dashboard", link: "#" },
+        // { title: "GLANSA SLMS", link: "/" },
+        // { title: "Dashboard", link: "#" },
     ]);
 
     const token = getToken();

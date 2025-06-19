@@ -41,9 +41,9 @@ const goToPaymentsform = () => {
     { name: 'Payment_Mode', selector: row => row.modeofpmtname, sortable: true },
     { name: 'M_No', selector: row => row.mno, sortable: true },
     { name: 'Account no', selector: row => row.acntno, sortable: true },
-    { name: 'Aadhaar', selector: row => row.aadhaarno, sortable: true },
-  
-    { name: 'Amount', selector: row => row.amount, sortable: true }
+    { name: 'Amount', selector: row => row.amount, sortable: true },
+    { name: 'EntryBy', selector: row => row.user && row.user.name ? row.user.name : '', sortable: true }
+
   ];
 
   const handlePageChange = (page) => {

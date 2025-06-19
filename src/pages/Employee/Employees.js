@@ -9,6 +9,7 @@ const Member = () => {
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
+    const storedPermissions = JSON.parse(localStorage.getItem('permissions') || '[]');
 
   useEffect(() => {
     //add loaddata function
@@ -51,18 +52,22 @@ const Member = () => {
       name: 'Actions',
       cell: row => (
         <div>
+          {(storedPermissions.includes("employee-edit") ) && (
         <Link to ={`/employeedit/${row.employeeid_encpt}`}
           className="btn btn-sm btn-primary"
           title="Edit"
         >
           <i className='fas fa-edit' />
         </Link>
-        {/* <Link to ={`/memberview/${row.m_no_encpt}`}
-          className="btn btn-sm btn-primary mr-2 ml-2" style={{marginLeft:"5px"}}
-          title="Edit"
-        >
-          <i className='fas fa-eye' />
-        </Link> */}
+         )}
+         {(storedPermissions.includes("employee-view") ) && (
+               <Link to ={`/employeeview/${row.employeeid_encpt}`}
+                 className="btn btn-sm btn-primary mr-2 ml-2" style={{marginLeft:"5px"}}
+                 title="Edit"
+               >
+                 <i className='fas fa-eye' />
+               </Link>
+          )}
         </div>
       ),
       ignoreRowClick: true,

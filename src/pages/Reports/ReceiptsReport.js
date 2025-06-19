@@ -1,5 +1,9 @@
 import React from 'react';
 import DataTable from 'react-data-table-component';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const columns = [
   { name: '#', selector: (row, i) => i + 1, width: '50px' },
@@ -12,26 +16,60 @@ const columns = [
   { name: 'Interest', selector: row => row.interest, sortable: true, right: true },
   { name: 'Late Fee', selector: row => row.latefee, sortable: true, right: true },
   { name: 'Total Amount', selector: row => row.totalamount, sortable: true, right: true },
-  { name: 'Total Savings', selector: row => row.totalsavings, sortable: true, right: true },
-  { name: 'Loan Pending', selector: row => row.loanpending, sortable: true, right: true },
-  { name: 'Loan Account No', selector: row => row.loanacntno, sortable: true },
-  { name: 'Loan Type Name', selector: row => row.loantypename, sortable: true },
-  { name: 'Last Paid Date', selector: row => row.lastpaiddate, sortable: true },
-  { name: 'ROI', selector: row => row.roi, sortable: true, right: true },
-  { name: 'Entry Date', selector: row => row.entrydate, sortable: true },
-  { name: 'Modify Date', selector: row => row.modifydate, sortable: true },
 ];
 
 const ReceiptsDataTable = ({ data }) => {
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Receipts');
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const file = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(file, 'Receipts.xlsx');
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = columns.map(col => col.name);
+    const tableRows = data.map((row, i) => [
+      i + 1,
+      row.receipt_date,
+      row.receipts_id,
+      row.m_no,
+      row.membername,
+      row.towards,
+      row.amount,
+      row.interest,
+      row.latefee,
+      row.totalamount,
+    ]);
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      styles: { fontSize: 8 },
+      margin: { top: 10 },
+    });
+
+    doc.save('Receipts.pdf');
+  };
+
   return (
-    <DataTable
-      columns={columns}
-      data={data || []}
-      pagination
-      highlightOnHover
-      defaultSortFieldId={2} // you can pick which column to sort default by
-      dense
-    />
+    <div>
+      <div style={{ marginBottom: 10 }}>
+        <button className='btn btn-success' onClick={exportToExcel}>Export to Excel</button>{' '}
+        <button className='btn btn-danger mr-2' onClick={exportToPDF}>Export to PDF</button>
+      </div>
+
+      <DataTable
+        columns={columns}
+        data={data || []}
+        pagination
+        highlightOnHover
+        defaultSortFieldId={2}
+        dense
+      />
+    </div>
   );
 };
 

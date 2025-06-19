@@ -231,14 +231,7 @@ if (!formData.from_date && formData.to_date) {
                     </Col>
                   </Row>
                 </form>
-                { formData.report_type == 2 && Array.isArray(reportSummary) && (
-                    <div style={{ overflowX: 'auto', marginTop: 30 }}>
-                        <h5 style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            Receipts Scroll Data
-                        </h5>
-                      <ReceiptsDataTable data={reportSummary} />
-                    </div>
-                )}
+               
 
 
                 {formData.report_type == 1  && (
@@ -246,7 +239,7 @@ if (!formData.from_date && formData.to_date) {
                        <>
                         <button className='btn btn-success' onClick={() => exportToExcel(data)}>Export to Excel</button>
                         <button className='btn btn-danger mr-2' onClick={() => exportToPDF(data)}>Export to PDF</button>
-                      </>
+                        </>
                         <Row>
                             <h5 className='text-center' >
                                     Summary for Selected Period:  {formData.from_date} to {formData.to_date}
@@ -297,6 +290,24 @@ if (!formData.from_date && formData.to_date) {
                     </div>
                 )}
 
+                 { formData.report_type == 2 && Array.isArray(reportSummary) && (
+                    <div style={{ overflowX: 'auto', marginTop: 30 }}>
+                        <h5 style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            Receipts Scroll Data
+                        </h5>
+                      <ReceiptsDataTable data={reportSummary} />
+                    </div>
+                )}
+
+                { formData.report_type == 3 && Array.isArray(reportSummary) && (
+                    <div style={{ overflowX: 'auto', marginTop: 30 }}>
+                        <h5 style={{ textAlign: 'center', marginBottom: '20px' }}>
+                        Payment Scroll Data
+                        </h5>
+                        <PaymentDataTable data={reportSummary} />
+                    </div>
+                )}
+
                 { formData.report_type == 4 && Array.isArray(reportSummary) && (
                     <div style={{ overflowX: 'auto', marginTop: 30 }}>
                         <h5 style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -316,14 +327,7 @@ if (!formData.from_date && formData.to_date) {
                     </div>
                 )}
 
-                { formData.report_type == 3 && Array.isArray(reportSummary) && (
-                    <div style={{ overflowX: 'auto', marginTop: 30 }}>
-                        <h5 style={{ textAlign: 'center', marginBottom: '20px' }}>
-                        Payment Scroll Data
-                        </h5>
-                        <PaymentDataTable data={reportSummary} />
-                    </div>
-                )}
+                
               </CardBody>
             </Card>
           </Col>

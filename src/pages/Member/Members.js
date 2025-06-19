@@ -9,6 +9,7 @@ const Member = () => {
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
+  const storedPermissions = JSON.parse(localStorage.getItem('permissions') || '[]');
 
   useEffect(() => {
     //add loaddata function
@@ -42,6 +43,16 @@ const Member = () => {
 
   const columns = [
     { name: 'M.no.', selector: row => row.m_no, sortable: true },
+    { name: 'image', cell: row => <img
+          src={row.image ? `${row.image}` : ""}
+          alt="profile"
+          className="rounded-circle img-fluid mb-3"
+          style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+          onError={e => {
+            e.target.onerror = null;
+            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+          }}
+        />, sortable: true },
     { name: 'Name', selector: row => row.name, sortable: true },  
     { name: 'Surname', selector: row => row.surname, sortable: true },
     { name: 'DOJ', selector: row => row.doj, sortable: true },
@@ -51,19 +62,28 @@ const Member = () => {
       name: 'Actions',
       cell: row => (
         <div>
+           {(storedPermissions.includes("member-view") ) && (
         <Link to ={`/membersedit/${row.m_no_encpt}`}
           className="btn btn-sm btn-primary"
           title="Edit"
         >
           <i className='fas fa-edit' />
         </Link>
-        <Link to ={`/memberview/${row.m_no_encpt}`}
-          className="btn btn-sm btn-primary mr-2 ml-2" style={{marginLeft:"5px"}}
-          title="Edit"
+        )}
+        {(storedPermissions.includes("member-edit") ) && (
+       <a
+          href={`/memberview/${row.m_no_encpt}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-sm btn-primary"
+          title="View"
+          style={{ marginLeft: "5px" }}
         >
           <i className='fas fa-eye' />
-        </Link>
+        </a>
+        )}
         </div>
+        
       ),
       ignoreRowClick: true,
     },

@@ -45,6 +45,7 @@ const [errors, setErrors] = useState({});
             return {
                 label: mNoStr,
                 value: mNoStrVal,
+                image: item.image ? item.image : '',
             };
         });
         setOptions(selectOptions);
@@ -63,12 +64,12 @@ const [errors, setErrors] = useState({});
   }, []);
 
 
-const fetchDropdownOptions = (parentId, setOptions) => {
+const fetchDropdownOptions = (parentId, setoptions) => {
   CustomFetch(`/dropdown-options/parent/${parentId}`)
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      setOptions(
+      setoptions(
         data.map((item) => ({
           value: item.id,
           label: item.name,
@@ -159,12 +160,16 @@ const handleChange = (valueOrEvent, actionMeta) => {
      updatedFormData.typename = selected ? selected.label : '';
   }
   if(name === 'purposecode') {
-     const selected = loanTypeOptions.find(opt => opt.value === value);
+     const selected = purposeOptions.find(opt => opt.value === value);
     updatedFormData.purpose = selected ? selected.label : '';
   }
  if(name === 'modeofrepaymentcode') {
-    const selected = loanTypeOptions.find(opt => opt.value === value);
+    const selected = modeOfRepaymentOptions.find(opt => opt.value === value);
     updatedFormData.modeofrepayment = selected ? selected.label : '';
+  }
+   if(name === 'status') {
+    const selected = loanStatusOptions.find(opt => opt.value === value);
+    updatedFormData.statusname = selected ? selected.label : '';
   }
 
   if (name === 'installments' || name === 'issuedate') {
@@ -194,6 +199,13 @@ const handleChange = (valueOrEvent, actionMeta) => {
     } else {
       updatedFormData.instamount = '';
     }
+  }
+
+  if (name === 'mno') {
+      const selectedOption = options.find(option => option.value === String(value));
+
+        updatedFormData.image = selectedOption ? selectedOption.image : null;
+
   }
 
   setFormData(updatedFormData);
@@ -304,6 +316,7 @@ const fetchLoanDetails = async (id) => {
     surity2totalsavings: s2savings ? parseFloat(parseFloat(s2savings).toFixed(2)) : '',
     surity2loanpending: s2loan || '',
   }));
+  console.log(data,"formData");
 };
 
 
@@ -398,9 +411,7 @@ const handleClear = () => {
     <div className="page-content">
       <div className='page-title-box d-sm-flex align-items-center justify-content-between '>
             <h4>Loan Add</h4>
-            {/* <button type="button" className="btn btn-success waves-effect waves-light" onClick={() => navigate('/Form')}>
-              <i className="fas fa-plus align-middle me-2"></i> Add
-            </button> */}
+           
           </div>
       <Container fluid>
         <Row>
@@ -410,46 +421,64 @@ const handleClear = () => {
                 <form onSubmit={handleSubmit}>
       <Row>
         <Col md={6}>
-          <div className="mb-3">
-            <Label >Member No</Label>
-            {id ? (
+          <Row>
+            <Col md={6}>
+              <div className="mb-3">
+              <Label >Member No</Label>
+              {id ? (
+                <Input
+                  type="text"
+                  value={formData.mno || ''}
+                  onChange={handleChange}
+                  name="mno"
+                  readOnly
+                />
+              ) : (
+                <Select
+                options={options}
+                value={formData.mno ? options.find(option => option.value === String(formData.mno)) : null}  
+                // value={formData.mno ? { value: formData.mno, label: formData.mno } : null} 
+                onChange={handleChange}
+                isClearable
+                name="mno"
+                className={errors.mno ? 'react-select-error' : ''}
+                classNamePrefix="react-select"
+              />
+              )}
+              {errors.mno && (
+                  <div className="text-danger mt-1">{errors.mno}</div>
+                )}
+            </div>
+            <div className="mb-3">
+              <Label>Member Name</Label>
               <Input
                 type="text"
-                value={formData.mno || ''}
+                value={formData.mname || ''}
                 onChange={handleChange}
-                name="mno"
+                name="mname"
                 readOnly
+              invalid={!!errors.mname}  
               />
-            ) : (
-              <Select
-              options={options}
-              value={formData.mno ? options.find(option => option.value === String(formData.mno)) : null}  
-              // value={formData.mno ? { value: formData.mno, label: formData.mno } : null} 
-              onChange={handleChange}
-              isClearable
-              name="mno"
-              className={errors.mno ? 'react-select-error' : ''}
-              classNamePrefix="react-select"
-            />
-            )}
-            {errors.mno && (
-                <div className="text-danger mt-1">{errors.mno}</div>
+              {errors.mname && (
+                <div className="text-danger mt-1">{errors.mname}</div>
               )}
-          </div>
-          <div className="mb-3">
-            <Label>Member Name</Label>
-            <Input
-              type="text"
-              value={formData.mname || ''}
-              onChange={handleChange}
-              name="mname"
-              readOnly
-             invalid={!!errors.mname}  
-            />
-             {errors.mname && (
-              <div className="text-danger mt-1">{errors.mname}</div>
-            )}
-          </div>
+            </div>
+            </Col>
+            <Col md={6} className='justify-content-center d-flex m-auto'>
+
+                    <img
+                        src={formData.image ? `${formData.image}` : ""}
+                        alt="profile"
+                        className="rounded-circle img-fluid mb-3"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                        onError={e => {
+                          e.target.onerror = null;
+                          e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                        }}
+                      />
+
+            </Col>
+          </Row>
           <div className="mb-3">
             <Label>Loan Type</Label>
             <Select
@@ -525,6 +554,7 @@ const handleClear = () => {
               value={formData.issueamount || ''}
               onChange={handleChange}
               name="issueamount"
+               min={0}
                invalid={!!errors.issueamount}  
             />
              {errors.issueamount && (
@@ -538,6 +568,7 @@ const handleClear = () => {
               value={formData.installments || ''}
               onChange={handleChange}
               name="installments"
+              min={1}
                invalid={!!errors.installments}  
             />
             {errors.installments && (
@@ -552,6 +583,7 @@ const handleClear = () => {
               onChange={handleChange}
               name="instamount"
               readOnly
+              min={0}
               invalid={!!errors.instamount}  
             />
              {errors.installments && (
@@ -625,6 +657,7 @@ const handleClear = () => {
               value={formData.mshipmonths || ''}
               onChange={handleChange}
               name="mshipmonths"
+              min={0}
               readOnly
             />
           </div>
@@ -635,6 +668,7 @@ const handleClear = () => {
               value={formData.totalsavingamt || ''}
               onChange={handleChange}
               name="totalsavingamt"
+              min={0}
               readOnly
             />
           </div>
@@ -645,6 +679,7 @@ const handleClear = () => {
               value={formData.eligibleamt || ''}
               onChange={handleChange}
               name="eligibleamt"
+              min={0}
               readOnly
             />
           </div>
@@ -652,6 +687,7 @@ const handleClear = () => {
             <Label>Eligible Installments</Label>
             <Input
               type="number"
+              min={1}
               value={formData.eligibleinstallments || ''}
               onChange={handleChange}
               name="eligibleinstallments"
@@ -668,6 +704,20 @@ const handleClear = () => {
               name="clearancedate"
               readOnly
             />
+          </div>
+          <div  className='mb-3'>
+            {id && (
+            <>
+              <label>Loan Pending </label>
+              <Input
+              type="number"
+              value={formData.loanpending || ''}
+              onChange={handleChange}
+              name="loanpending"
+              readOnly
+            />
+            </>
+            )}
           </div>
 
         </Col>

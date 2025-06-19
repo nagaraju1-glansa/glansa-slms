@@ -13,16 +13,17 @@ import './Auth.css';
 const Login = () => {
   const navigate = useNavigate();
   const [loginType, setLoginType] = useState('company');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      username: '',
-      password: '',
-      member_no: '',
-      aadhar_no: '',
-      type: '',
-    }
-  });
+ const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+  defaultValues: {
+    username: '',
+    password: '',
+    member_no: '',
+    aadhar_no: '',
+    type: '',
+  }
+});
 
   const onSubmit = (data) => {
     const payload = loginType === 'company' 
@@ -103,6 +104,24 @@ const Login = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                       {/* Company Login */}
                       <div className={`login-section ${loginType !== 'company' ? 'hidden' : ''}`}>
+                        {/* Demo Login Buttons */}
+                        <div className="mb-3 text-center">
+                          <span className="me-2">Try Demo:</span>
+                          <Button size="sm" color="info" className="me-2" onClick={() => {
+                            setValue("username", "superadmin");
+                            setValue("password", "superadmin");
+                          }}>SuperAdmin</Button>
+                          <Button size="sm" color="primary" className="me-2" onClick={() => {
+                            setValue("username", "admin");
+                            setValue("password", "admin123");
+                          }}>Admin</Button>
+                          <Button size="sm" color="success" onClick={() => {
+                            setValue("username", "employee");
+                            setValue("password", "employee123");
+                          }}>Employee</Button>
+                        </div>
+
+                        {/* Username */}
                         <div className="auth-form-group-custom mb-4">
                           <i className="ri-user-2-line auti-custom-input-icon"></i>
                           <Label htmlFor="username">Username</Label>
@@ -122,7 +141,8 @@ const Login = () => {
                           {errors.username && <div className="invalid-feedback">{errors.username.message}</div>}
                         </div>
 
-                        <div className="auth-form-group-custom mb-4">
+                        {/* Password with Toggle */}
+                        <div className="auth-form-group-custom mb-4 position-relative">
                           <i className="ri-lock-2-line auti-custom-input-icon"></i>
                           <Label htmlFor="password">Password</Label>
                           <Controller
@@ -130,19 +150,33 @@ const Login = () => {
                             control={control}
                             rules={{ required: loginType === 'company' && "Password is required" }}
                             render={({ field }) => (
-                              <Input
-                                id="password"
-                                type="password"
-                                placeholder="Enter password"
-                                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                                {...field}
-                              />
+                              <div className="position-relative1">
+                                <Input
+                                  id="password"
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="Enter password"
+                                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                  {...field}
+                                />
+                                <span
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  style={{
+                                    position: "absolute",
+                                    right: "10px",
+                                    top: "50%",
+                                    transform: "translateY(-50%)",
+                                    cursor: "pointer"
+                                  }}
+                                >
+                                  <i className={`ri-eye${showPassword ? "-off" : ""}-line`}></i>
+                                </span>
+                              </div>
                             )}
                           />
                           {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                         </div>
+                        
                       </div>
-
                       {/* Member Login */}
                       <div className={`login-section ${loginType !== 'member' ? 'hidden' : ''}`}>
                         <div className="auth-form-group-custom mb-4">

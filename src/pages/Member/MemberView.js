@@ -109,15 +109,15 @@ const Memberview = () => {
                <img
                         src={
                             member.image
-                            ? `${process.env.REACT_APP_APIURL}storage/uploads/${member.image}`
-                            : "https://i.pravatar.cc/150?img=5"
+                            ? `${member.image}`
+                            : ""
                         }
                         alt="profile"
                         className="rounded-circle img-fluid mb-3"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                             e.target.onerror = null;
-                            e.target.src = "https://i.pravatar.cc/150?img=5";
+                            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
                         }}
                         />
               <h4>{member.name} {member.surname}</h4>

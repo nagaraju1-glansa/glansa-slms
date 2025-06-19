@@ -32,10 +32,10 @@ const AppRoute = (props) => {
 	const location = useLocation();
 	const [authChecked, setAuthChecked] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
 
   useEffect(() => {
     const token = getToken();
-
     if (!token) {
       setIsValid(false);
       setAuthChecked(true);
@@ -56,16 +56,26 @@ const AppRoute = (props) => {
         }
         return res.json();
       })
-      .then(() => {
+      .then((data) => {
+         console.log(localStorage.getItem('RoleId'));
+         const permissions =[];
+        if(localStorage.getItem('RoleId') != 'Member') {
+          const permissions = data.user.permissions || [];
+          localStorage.setItem('permissions', JSON.stringify(permissions));
+          setHasPermission(!props.permission || permissions.includes(props.permission));
+        }
         setIsValid(true);
         setAuthChecked(true);
+       
+        console.log(permissions);
+        
       })
       .catch(() => {
         sessionStorage.clear();
         setIsValid(false);
         setAuthChecked(true);
       });
-  }, []);
+  }, [props.permission]);
 
  if (!authChecked) {
     return <div className="loader">
@@ -77,7 +87,14 @@ const AppRoute = (props) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{props.children}</>;
+  
+  if (!hasPermission && localStorage.getItem('RoleId') != 'Member') {
+    return <Navigate to="/dashboard" replace />;
+  }else{
+    return <>{props.children}</>;
+  }
+
+  // return <>{props.children}</>;
 };
 
 export default AppRoute;

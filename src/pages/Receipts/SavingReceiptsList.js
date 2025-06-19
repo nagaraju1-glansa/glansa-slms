@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CustomFetch } from '../ApiConfig/CustomFetch';
+import Swal from 'sweetalert2';
 
 const SavingReceiptsList = () => {
   const [receipts, setReceipts] = useState([]); 
@@ -10,6 +11,7 @@ const SavingReceiptsList = () => {
   const [totalRows, setTotalRows] = useState(0); 
   const [searchText, setSearchText] = useState(''); 
   const navigate = useNavigate();
+  const storedPermissions = JSON.parse(localStorage.getItem('permissions') || '[]');
 
   useEffect(() => {
     const loadData = async () => {
@@ -29,13 +31,38 @@ const SavingReceiptsList = () => {
   }, [currentPage, rowsPerPage, searchText]); 
 
   const columns = [
+    { name: 'ReceiptId', selector: row => row.receipts_id, sortable: true },
+    { name: 'Receipt Date', selector: row => row.receipt_date, sortable: true },
     { name: 'Member Name', selector: row => row.membername, sortable: true },
     { name: 'Member No.', selector: row => row.m_no, sortable: true },
-    { name: 'Name', selector: row => row.membername, sortable: true },
     { name: 'Amount', selector: row => row.amount, sortable: true },
+    { name: 'Latefee', selector: row => row.latefee, sortable: true },
+    { name: 'TotalPaid', selector: row => row.totalamount, sortable: true },
     { name: 'Towards', selector: row => row.towards, sortable: true },
-    { name: 'Receipt Date', selector: row => row.receipt_date, sortable: true },
-    { name: 'Entry By', selector: row => row.user.username, sortable: true },
+    // { name: 'EntryBy', selector: row => row.user && row.user.name ? row.user.name : '', sortable: true }
+    { 
+      name: 'EntryBy', 
+      selector: row => row.order_id === null ? (row.user && row.user.name ? row.user.name : '') : row.membername, 
+      sortable: true 
+    },
+        {
+          name: 'Actions',
+          cell: row => (
+            <div>
+               {(storedPermissions.includes("receipt-delete") ) && (
+                  <button
+                    className="btn btn-sm btn-danger"
+                    title="Delete"
+                    onClick={() => handleDelete(row)}
+                  >
+                    <i className='fas fa-trash' />
+                  </button>
+                )}
+            </div>
+            
+          ),
+          ignoreRowClick: true,
+        },
   ];
 
   const handlePageChange = (page) => {
@@ -47,15 +74,52 @@ const SavingReceiptsList = () => {
     setCurrentPage(page); 
   };
 
+
+  const handleDelete = (row) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    html: `
+      <p><strong>Receipt ID:</strong> ${row.receipts_id}</p>
+      <p><strong>Member No:</strong> ${row.m_no}</p>
+      <p><strong>Member Name:</strong> ${row.membername}</p>
+      <p><strong>Amount:</strong> ₹${row.amount}</p>
+    `,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await CustomFetch(`/receiptdelete/${row.receipts_id}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire('Deleted!', 'Receipt has been deleted.', 'success');
+          setReceipts((prev) => prev.filter(r => r.receipts_id !== row.receipts_id));
+        } else {
+          Swal.fire('Error', data.message || 'Could not delete receipt.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Server error occurred.', 'error');
+      }
+    }
+  });
+};
+
   return (
     <React.Fragment>
       <div className="page-content">
         <div>
           <div className='page-title-box d-sm-flex align-items-center justify-content-between'>
             <h4 className="mb-0">Saving Receipts</h4>
-            <button type="button" className="btn btn-success waves-effect waves-light" onClick={() => navigate('/receiptsadd')}>
+            {localStorage.getItem('RoleId') === 'Member' ? null : (
+               <button type="button" className="btn btn-success waves-effect waves-light" onClick={() => navigate('/receiptsadd')}>
               <i className="fas fa-plus align-middle me-2"></i> Add
             </button>
+            )}
+           
           </div>
           <div className='col-xl-2 mb-3'>
             <input

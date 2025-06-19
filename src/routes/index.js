@@ -27,51 +27,62 @@ import Company from "../pages/Company/Company";
 import Memberview from "../pages/Member/MemberView";
 import EmployeeAdd from "../pages/Employee/EmployeeAdd";
 import Employees from "../pages/Employee/Employees";
-import RoleBasedRoute from "./RoleBasedRoute"; // import it
 
-
-
+import SavingsPaymentPage from "../pages/Razor/SavingsPaymentPage";
+import RoleManager from "../pages/RoleManager/RoleManager";
+import Role from "../pages/RoleManager/Role";
+import EmployeeView from "../pages/Employee/EmployeeView";
+import LoanPaymentPage from "../pages/Razor/LoanPaymentPage";
+import LandingPage from "../pages/LandingPage/LandingPage";
+import LoanView from "../pages/Loan/LoanView";
 const authProtectedRoutes = [
 
-	{ path: "/members", component: <RoleBasedRoute allowedRoles={[1,2,3]}>
-									<Member /> 
-								</RoleBasedRoute>},
-	{ path: "/savingreceipts", component: <SavingReceiptslist /> },
-	{ path: "/loanreceipts", component: <LoanReceiptslist /> },
-	{ path: "/membersadd", component: <MembersAdd /> },
-	{ path: "/membersedit/:id", component: <MembersAdd /> },
-	// PaymentsAdd
-	{ path: "/paymentsadd", component: <PaymentsAdd /> },
-	{ path: "/payments", component: <PaymentsList /> },
+	{ path: "/members", component: <Member /> , permission: "member-list"},			 ,
+	{ path: "/membersadd", component: <MembersAdd />, permission: "member-add" },
+	{ path: "/membersedit/:id", component: <MembersAdd /> , permission: "member-edit" },
+	{ path: "/memberview/:id", component: <Memberview /> ,  permission: "member-view"},
 
-	{ path: "/loans", component: <LoanList /> },
-	{ path: "/loanadd", component: <LoanListAdd /> },
+	{ path: "/savingreceipts", component: <SavingReceiptslist /> , permission: "loan-receipt-list"},
+	{ path: "/loanreceipts", component: <LoanReceiptslist /> , permission: "saving-receipt-list"},
+	{ path: "/receiptsadd", component: <ReceiptsAdd /> , permission: "receipt-add"},
+	
+	// PaymentsAdd
+	{ path: "/paymentsadd", component: <PaymentsAdd /> , permission: "payment-add"},
+	{ path: "/payments", component: <PaymentsList /> , permission: "payment-list"},
+
+	{ path: "/loans", component: <LoanList /> , permission: "loan-list"},
+	{ path: "/loanadd", component: <LoanListAdd /> , permission: "loan-add"},
 	{ path: "/loanedit/:id", component: <LoanListAdd /> },
 	{ path: "/loan-installments/:id/:mno", component: <LoanInstallmentsList /> },
+	{ path: "/loanview/:id", component: <LoanView /> },
 
-
-
-	{ path: "/receiptsadd", component: <ReceiptsAdd /> },
-
-	{ path: "/reports", component: <Reports /> },
-
+	
 	{ path: "/withdrawaladd", component: <MembershipWithdrawalForm /> },
 	{ path: "/withdrawals", component: <Withdrawals /> },
 	{ path: "/withdrawaledit/:id", component: <MembershipWithdrawalForm /> },
+
 	{ path: "/interestrun", component: <InterestRun /> },
 
+	{ path: "/reports", component: <Reports /> },
+
 	{ path: "/profile", component: <Profile /> },
+
 	{ path: "/company", component: <Company /> },
-	{ path: "/memberview/:id", component: <Memberview /> },
+	
 	{ path: "/employeeadd", component: <EmployeeAdd /> },
 	{ path: "/employees", component: <Employees /> },
 	{ path: "/employeedit/:id", component: <EmployeeAdd /> },
+	{ path: "/employeeview/:id", component: <EmployeeView /> },
 
+	{ path: "/savingspayment", component: <SavingsPaymentPage /> },
+	{ path: "/loanpayment", component: <LoanPaymentPage /> },
 
-
-
+	{ path: "/rolemanager", component: <RoleManager /> },
+	{ path: "/roles", component: <Role /> },
 
 	{ path: "/dashboard", component: <Dashboard /> },
+
+	{ path: "/home", component: <LandingPage /> },
 
 	// this route should be at the end of all other routes
 	{ path: "/", exact: true, component: <Navigate to="/dashboard" /> },
@@ -81,6 +92,9 @@ const publicRoutes = [
 	{ path: "/logout", component: <Logout /> },
 	{ path: "/login", component: <Login /> },
 	{ path: "/forgot-password", component: <ForgetPwd /> },
+	{ path: "/home", component: <LandingPage /> },
+	{ path: "/", exact: true, component: <Navigate to="/home" /> },
+
 	// { path: "/register", component: <Register /> },
 	// { path: "/lock-screen", component: <AuthLockScreen /> },
 
