@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://127.0.0.1:8000/api';
+export const API_BASE_URL = 'https://api.glansadesigns.com/glansafin/api';
 export const getToken = () => localStorage.getItem('token');
 export const getCompanyId = () => localStorage.getItem('companyId');
 export const clearSession = () => localStorage.clear();
