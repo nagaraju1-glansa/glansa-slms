@@ -22,6 +22,12 @@ import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { CustomFetch } from "../ApiConfig/CustomFetch";
 import Swal from "sweetalert2";
 import { RoleId } from '../ApiConfig/ApiConfig';
+import {
+  validatePhoneNumber,
+  validateTextOnly,
+  validateAadhaar,
+  validatePAN
+} from "../../assets/js/validation";
 
 const EmployeeAdd = () => {
   const [breadcrumbItems] = useState([
@@ -54,7 +60,7 @@ const EmployeeAdd = () => {
      acntname: "",
      bankname: "",
      status: 1,
-     email: "",
+
 
   });
   const [preview, setPreview] = useState(null);
@@ -103,28 +109,44 @@ const EmployeeAdd = () => {
     }
   };
 
-const handleInput = (e) => {
-  const { name, type, value, checked } = e.target;
-  let updated = {};
+  const handleInput = (e) => {
+  const { name, type, value, checked, files } = e.target;
 
-   if (type == 'checkbox') {
-    updated = {
-      ...formData,
-      [name]: checked ? 1 : 0, // ✅ Use 1 for checked, 0 for unchecked
-    };
-    
-  }
-  else {
-    updated = {
-      ...formData,
-      [name]: value,
-    };
-  }
+  let updated = {
+    ...formData,
+    [name]:
+      type === 'checkbox' ? (checked ? 1 : 0) :
+      // type === 'file' ? files[0] :
+      type === 'number' ? parseInt(value || 0) :
+      type === 'text' ? value.trimStart() :
+      value,
+  };
 
   setFormData(updated);
-//   console.log(updated);
- 
 };
+
+// const handleInput = (e) => {
+//   const { name, type, value, checked } = e.target;
+//   let updated = {};
+
+//    if (type == 'checkbox') {
+//     updated = {
+//       ...formData,
+//       [name]: checked ? 1 : 0, // ✅ Use 1 for checked, 0 for unchecked
+//     };
+    
+//   }
+//   else {
+//     updated = {
+//       ...formData,
+//       [name]: value,
+//     };
+//   }
+
+//   setFormData(updated);
+// //   console.log(updated);
+ 
+// };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -150,7 +172,8 @@ const handleInput = (e) => {
       password,
       username,
       role_id,
-      dob
+      dob,
+      email
     } = formData;
     const newErrors = {};
 
@@ -163,10 +186,27 @@ const handleInput = (e) => {
     //   if (!(surname || "").trim()) newErrors.surname = "Surname is required.";
     //   if (!(aadhaarno || "").trim()) newErrors.aadhaarno = "Adhaar number is required.";
       if (!id && !(formData.password || "").trim()) newErrors.password = "Password is required.";
+      if (!(email || "").trim()) newErrors.email = "Email is required.";
       if (!(username || "").trim()) newErrors.username = "Username is required.";
       if (!(role_id || "")) newErrors.role_id = "Role is required.";
 
 
+
+      if (!validatePhoneNumber(formData.phonenumber) && formData.phonenumber) {
+        newErrors.phonenumber = "Enter a valid 10-digit mobile number.";
+      }
+
+      if (!validateTextOnly(formData.name)) {
+        newErrors.name = "Name should contain only letters.";
+      }
+
+      if (!validateAadhaar(formData.aadhaarno) && formData.aadhaarno) {
+        newErrors.aadhaarno = "Enter a valid 12-digit Aadhaar number.";
+      }
+
+      if (!validatePAN(formData.panno)  && formData.panno ) {
+        newErrors.panno = "Enter a valid PAN number (e.g. ABCDE1234F).";
+      }
 
 
 
@@ -206,6 +246,7 @@ const handleInput = (e) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
       const url = id ? `/edit-user/${id}` : `/add-user`;  // If `id` exists, it's an update, else it's add
       const form = new FormData();
@@ -327,7 +368,7 @@ const handleInput = (e) => {
                               <div className="mb-3">
                                 <Label className="form-label" htmlFor="surname">
                                   Surname{" "}
-                                 <span className="text-danger"> *</span>
+                                 {/* <span className="text-danger"> *</span> */}
                                 </Label>
                                 <input
                                   type="text"
@@ -371,14 +412,14 @@ const handleInput = (e) => {
                               <div className="mb-3">
                                 <Label className="form-label" htmlFor="phone1">
                                   Email
-                                 {/* <span className="text-danger"> *</span> */}
+                                 <span className="text-danger"> *</span>
                                 </Label>
                                 <Input
                                   type="email"
                                   className="form-control"
                                   id="email"
                                   name="email"
-                                  value={null? null: formData.email }
+                                  value={formData.email}
                                   onChange={handleInput}
                                   required
                                 />
@@ -417,7 +458,7 @@ const handleInput = (e) => {
                                  <span className="text-danger"> *</span>
                                 </Label>
                                 <Input
-                                  type="text"
+                                  type="password"
                                   className="form-control"
                                   id="password"
                                   name="password"
@@ -456,7 +497,15 @@ const handleInput = (e) => {
                                 {formData.image &&(
                                   <div className="mt-3">
                                     <p>Image :</p>
-                                    <img src={formData.image} alt="Preview" style={{ maxWidth: '300px', height: '300px' }} />
+                                      <img
+                                        src={
+                                          formData.image
+                                            ? `${process.env.REACT_APP_APIURL_IMAGE}employees/${formData.image}`
+                                            : `${process.env.REACT_APP_APIURL_IMAGE}/user.jpg`
+                                        }
+                                        alt="Preview"
+                                        style={{ maxWidth: '300px', height: '300px' }}
+                                      />
                                   </div>
                                 )}
                               
@@ -473,7 +522,7 @@ const handleInput = (e) => {
                                   className="form-control"
                                   id="doj"
                                   name="doj"
-                                  value={formData.doj || ""}
+                                  value={formData.doj}
                                   onChange={handleInput}
                                   required
                                 />
@@ -493,7 +542,7 @@ const handleInput = (e) => {
                                   className="form-control"
                                   id="dob"
                                   name="dob"
-                                  value={formData.dob || ""}
+                                  value={formData.dob}
                                   onChange={handleInput}
                                   required
                                 />
@@ -569,6 +618,11 @@ const handleInput = (e) => {
                                   value={formData.panno || ""}
                                   onChange={handleInput}
                                 />
+                                {errors.panno && (
+                                  <div className="text-danger mt-1">
+                                    {errors.panno}
+                                  </div>
+                                )}
                               </div>
                                 <div className="mb-3">
                                 <Label className="form-label" htmlFor="panno">

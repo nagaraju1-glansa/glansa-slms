@@ -96,7 +96,7 @@ const Memberview = () => {
             <div className="page-content">
               <div className='page-title-box d-sm-flex align-items-center justify-content-between'>
               <h4 className="mb-0">Member Profile</h4>
-              <button type="button" className="btn btn-success waves-effect waves-light"  onClick={()=> navigate(`/membersedit/${localStorage.getItem('mencpt')}`) }>
+              <button type="button" className="btn btn-success waves-effect waves-light"  onClick={()=> navigate(`/membersedit/${id}`) }>
                   <i className="fas fa-edit align-middle me-2"></i> Edit 
               </button>
           </div>
@@ -109,7 +109,7 @@ const Memberview = () => {
                <img
                         src={
                             member.image
-                            ? `${member.image}`
+                            ? `${process.env.REACT_APP_APIURL_IMAGE}members/${member.image}`
                             : ""
                         }
                         alt="profile"
@@ -117,12 +117,12 @@ const Memberview = () => {
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                             e.target.onerror = null;
-                            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                            e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
                         }}
                         />
               <h4>{member.name} {member.surname}</h4>
               <p className="text-muted">{member.designation}</p>
-              <span className="badge bg-primary">Member ID: {member.m_no}</span>
+              <span className="badge bg-primary">Member ID: {member.member_id}</span>
               {member.savings && member.savings.length > 0 &&(
                 <div>
 

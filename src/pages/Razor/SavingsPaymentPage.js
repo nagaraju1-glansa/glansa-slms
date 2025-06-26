@@ -20,6 +20,7 @@ const SavingsPaymentPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     m_no: '',
+    member_id: '', 
     name: '',
     amount: '100.00',
     receipt_date: new Date().toISOString().split('T')[0],
@@ -53,6 +54,7 @@ const SavingsPaymentPage = () => {
           setFormData({
             ...formData,
             m_no: data.m_no,
+            member_id: data.member_id,
             name: data.name,
             towardscode: '46'
           })
@@ -230,7 +232,7 @@ const SavingsPaymentPage = () => {
                   <CardBody>
                     <div className="p-3 bg-light mb-4">
                       <h5 className="font-size-14 mb-0">
-                       Member Number<span className="float-end ms-2">{formData.m_no}</span>
+                       Member Number<span className="float-end ms-2">{formData.member_id}</span>
                       </h5>
                     </div>
                     <div className="p-3 bg-light mb-4">

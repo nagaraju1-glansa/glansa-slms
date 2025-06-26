@@ -35,6 +35,12 @@ import EmployeeView from "../pages/Employee/EmployeeView";
 import LoanPaymentPage from "../pages/Razor/LoanPaymentPage";
 import LandingPage from "../pages/LandingPage/LandingPage";
 import LoanView from "../pages/Loan/LoanView";
+import ResetPasswordPage from "../pages/Authentication/ResetPasswordPage";
+import GlansaLogin from "../pages/Authentication/GlansaLogin";
+import GlansaMainCompanies from "../pages/Glansa/GlansaMainCompanies";
+import AddMainCompany from "../pages/Glansa/AddMainCompany";
+import CompanyPayments from "../pages/Glansa/CompanyPayments";
+import CompanySubscriptionAdd from "../pages/Glansa/CompanySubscriptionAdd";
 const authProtectedRoutes = [
 
 	{ path: "/members", component: <Member /> , permission: "member-list"},			 ,
@@ -52,13 +58,13 @@ const authProtectedRoutes = [
 
 	{ path: "/loans", component: <LoanList /> , permission: "loan-list"},
 	{ path: "/loanadd", component: <LoanListAdd /> , permission: "loan-add"},
-	{ path: "/loanedit/:id", component: <LoanListAdd /> },
-	{ path: "/loan-installments/:id/:mno", component: <LoanInstallmentsList /> },
-	{ path: "/loanview/:id", component: <LoanView /> },
+	{ path: "/loanedit/:id", component: <LoanListAdd /> , permission: "loan-edit"},
+	{ path: "/loan-installments/:id/:mno", component: <LoanInstallmentsList /> ,  },
+	{ path: "/loanview/:id", component: <LoanView /> , permission: "loan-view"},
 
 	
-	{ path: "/withdrawaladd", component: <MembershipWithdrawalForm /> },
-	{ path: "/withdrawals", component: <Withdrawals /> },
+	{ path: "/withdrawaladd", component: <MembershipWithdrawalForm /> , permission: "withdrawal-add"},
+	{ path: "/withdrawals", component: <Withdrawals /> , permission: "withdrawal-list"},
 	{ path: "/withdrawaledit/:id", component: <MembershipWithdrawalForm /> },
 
 	{ path: "/interestrun", component: <InterestRun /> },
@@ -79,8 +85,11 @@ const authProtectedRoutes = [
 
 	{ path: "/rolemanager", component: <RoleManager /> },
 	{ path: "/roles", component: <Role /> },
-
+	{ path: "/glansa-main-companies", component: <GlansaMainCompanies /> },
+	{ path: "/add-main-company", component: <AddMainCompany /> },
 	{ path: "/dashboard", component: <Dashboard /> },
+	{ path: "/company-payments", component: <CompanyPayments /> },
+	{ path: "/company-subscription-add", component: <CompanySubscriptionAdd /> },
 
 	{ path: "/home", component: <LandingPage /> },
 
@@ -91,9 +100,11 @@ const authProtectedRoutes = [
 const publicRoutes = [
 	{ path: "/logout", component: <Logout /> },
 	{ path: "/login", component: <Login /> },
+	{ path: "/glansa-login", component: <GlansaLogin /> },
 	{ path: "/forgot-password", component: <ForgetPwd /> },
 	{ path: "/home", component: <LandingPage /> },
 	{ path: "/", exact: true, component: <Navigate to="/home" /> },
+	{ path: "/reset-password", component: <ResetPasswordPage /> },
 
 	// { path: "/register", component: <Register /> },
 	// { path: "/lock-screen", component: <AuthLockScreen /> },

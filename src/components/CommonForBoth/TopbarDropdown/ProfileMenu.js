@@ -4,10 +4,12 @@ import { withTranslation } from "react-i18next";
 // import avatar2 from '../../../assets/images/users/avatar-2.jpg';
 import { API_BASE_URL } from '../../../pages/ApiConfig/ApiConfig'; // Update if different
 import { getToken } from '../../../pages/ApiConfig/ApiConfig'; // Update path as per your project
+import { RoleId } from '../../../pages/ApiConfig/ApiConfig';
 
 const ProfileMenu = ({ t }) => {
   const [menu, setMenu] = useState(false);
   const [member, setMember] = useState({});
+  
 
   const toggle = () => setMenu(prev => !prev);
 
@@ -17,7 +19,7 @@ const ProfileMenu = ({ t }) => {
     const uNm = obj.email.split("@")[0];
     username = uNm.charAt(0).toUpperCase() + uNm.slice(1);
   }
-  const roleId = localStorage.getItem('RoleId');
+  const roleId = RoleId();
 
   useEffect(() => {
     const fetchMemberDetails = async () => {
@@ -30,8 +32,17 @@ const ProfileMenu = ({ t }) => {
           }
         });
         const data = await response.json();
-        setMember(data.user);
-        console.log(data.user);
+        {roleId === 'Member' ? (
+          setMember(
+          data
+        )
+        ) : (
+         setMember(
+          data.user
+        )
+        )}
+        
+        console.log( `${process.env.REACT_APP_APIURL_IMAGE}members/${member.image}`);
       } catch (error) {
         console.error('Error fetching member details:', error);
       }
@@ -43,16 +54,31 @@ const ProfileMenu = ({ t }) => {
   return (
     <Dropdown isOpen={menu} toggle={toggle} className="d-inline-block user-dropdown">
       <DropdownToggle tag="button" className="btn header-item waves-effect" id="page-header-user-dropdown">
-        <img
-          src={member.image ? `${member.image}` : ""}
-          alt="profile"
-          className="rounded-circle img-fluid mb-3"
-          style={{ width: '30px', height: '30px', objectFit: 'cover' }}
-          onError={e => {
-            e.target.onerror = null;
-            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
-          }}
+        <img className="rounded-circle header-profile-user" 
+        src={
+          roleId == 'Member' ? `${process.env.REACT_APP_APIURL_IMAGE}members/${member.image}` : `${process.env.REACT_APP_APIURL_IMAGE}employees/${member.image}`
+        } 
+        alt="Header Avatar" height="32" 
+        onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
+            }}
         />
+
+            {/* <img
+            src="https://i.ibb.co/4pNtGkQ/1.jpg"
+            alt="profile"
+            className="rounded-circle img-fluid mb-3"
+            style={{
+              width: '30px',
+              height: '30px',
+              objectFit: 'cover',
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `${process.env.REACT_APP_APIURL}storage/app/public/uploads/user.jpg`;
+            }}
+          /> */}
         <span className="d-none d-xl-inline-block ms-1 text-transform">{username}</span>
         <i className="mdi mdi-chevron-down d-none ms-1 d-xl-inline-block"></i>
       </DropdownToggle>

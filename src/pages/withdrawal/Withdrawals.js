@@ -41,7 +41,7 @@ const Withdrawals = () => {
 
 
   const columns = [
-    { name: 'M.no.', selector: row => row.m_no, sortable: true },
+    { name: 'M.no.', selector: row => row.member_id, sortable: true },
     { name: 'Name', selector: row => row.name, sortable: true },  
     { name: 'Surname', selector: row => row.surname, sortable: true },
     { name: 'DOJ', selector: row => row.doj, sortable: true },

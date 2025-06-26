@@ -39,33 +39,7 @@ const RevenueAnalytics = () => {
                         }
                     };
             loadData();
-            // fetch(`${API_BASE_URL}/savingreportmonthly`,{
-            // headers: {
-            //     'Authorization': `Bearer ${token}`,
-            //     'Content-Type': 'application/json',
-            //     'Accept': 'application/json',
-            // }
-            // })
-            //     .then(res => res.json())
-            //     .then(data => {
-            //     const yearData = {
-            //         [currentYear]: new Array(1).fill(0),
-            //         [previousYear]: new Array(1).fill(0)
-            //     };
-            //     data.forEach(item => {
-            //         const monthIndex = item.month - 1;
-            //         if (yearData[item.year]) {
-            //          yearData[item.year][monthIndex] = item.total_amount;
-            //         }
-            //     });
-
-            //     const currentTotal = yearData[currentYear].reduce((sum, val) => sum + val, 0);
-            //     const previousTotal = yearData[previousYear].reduce((sum, val) => sum + val, 0);
-
-            //     setCurrentYearData(currentTotal);
-            //     setPreviousYearData(previousTotal);
-            //     })
-            //     .catch(error => console.error('Fetch error:', error));
+ 
             }, []);
 
         return (

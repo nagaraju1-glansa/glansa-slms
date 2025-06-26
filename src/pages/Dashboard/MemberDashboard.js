@@ -57,7 +57,18 @@ const MemberDashboard = () => {
                         <CardBody>
                             <div className="d-flex">
                                 <div className="flex-2 overflow-hidden">
-                                   <img
+                                    <img
+                                        src={memberStats.image ? `${process.env.REACT_APP_APIURL_IMAGE}members/${memberStats.image}` : ""}
+                                        alt="profile"
+                                        className="rounded-circle img-fluid mb-3"
+                                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                                        onError={e => {
+                                            e.target.onerror = null;
+                                            e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
+                                        }}
+                                        />
+
+                                   {/* <img
                                     src={
                                         memberStats.image
                                         ? `${process.env.REACT_APP_APIURL}storage/uploads/${memberStats.image}`
@@ -70,7 +81,7 @@ const MemberDashboard = () => {
                                         e.target.onerror = null;
                                         e.target.src = "https://i.pravatar.cc/150?img=5";
                                     }}
-                                    />
+                                    /> */}
                                      
                                 </div>
                                 <div className="text-primary p-3">

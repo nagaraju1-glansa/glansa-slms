@@ -20,6 +20,7 @@ const LoanPaymentPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     m_no: '',
+    member_id: '',
     name: '',
     amount: '',
     receipt_date: new Date().toISOString().split('T')[0],
@@ -53,6 +54,7 @@ const LoanPaymentPage = () => {
             setFormData({
             ...formData,
             m_no: data.m_no,
+            member_id: data.member_id,
             name: data.name,
             towardscode: '47',
           })

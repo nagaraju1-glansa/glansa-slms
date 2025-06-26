@@ -98,21 +98,21 @@ const LoanView = () => {
             {/* Left: Image and Basic Info */}
             <div className="col-md-4 text-center border-end">
             <img
-                        src={
-                            member.image
-                            ? `${member.image}`
-                            : ""
-                        }
+                       src={
+                              formData?.member?.image
+                                  ? `${process.env.REACT_APP_APIURL_IMAGE}members/${formData.member.image}`
+                                  :  ''
+                          }
                         alt="profile"
                         className="rounded-circle img-fluid mb-3"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                             e.target.onerror = null;
-                            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                           e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
                         }}
                 />
               <h4>{formData.mname}</h4>
-              <span className="badge bg-primary">Member ID: {member.m_no}</span>
+            <span className="badge bg-primary">Member ID: {formData.member?.member_id ?? '--'} </span>
 
   
                

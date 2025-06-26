@@ -57,6 +57,7 @@ const LandingPage = () => {
   subject: "",
   message: "",
 });
+const [isOpen, setIsOpen] = useState(false);
 
  useEffect(() => {
     const cssFiles = [
@@ -160,7 +161,7 @@ if (!stylesLoaded) return <div>...</div>;
                 <div className="navbar-header">
                   <div className="logo-mobile">
                     <a href="home">
-                       <img src={logoWhite} alt="Logo" />
+                       <img src={LogoHomeWhite} alt="Logo" />
                     </a>
                   </div>
                   {/* Toggle Button */}
@@ -170,6 +171,7 @@ if (!stylesLoaded) return <div>...</div>;
                     data-toggle="collapse"
                     data-target=".navbar-collapse"
                     aria-controls="main-menu"
+                    onClick={() => setIsOpen(!isOpen)}
                   >
                     <span className="icon-bar" />
                     <span className="icon-bar" />
@@ -177,7 +179,7 @@ if (!stylesLoaded) return <div>...</div>;
                   </button>
                 </div>
                 <div
-                  className="navbar-collapse collapse clearfix"
+                   className={`navbar-collapse collapse clearfix ${isOpen ? "show" : ""}`}
                   id="main-menu"
                 >
                   <ul className="navigation clearfix">

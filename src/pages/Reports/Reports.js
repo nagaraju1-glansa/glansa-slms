@@ -50,25 +50,35 @@ const handleReports = (option) => selectedReportsType(option);
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-if (formData.from_date && !formData.to_date) {
+  if (formData.report_type == null) {
   Swal.fire({
     title: 'Error!',
-    text: 'Please select the end date.',
+    text: 'Please select a report type.',
     icon: 'error',
     confirmButtonText: 'OK'
   });
   return;
 }
 
-if (!formData.from_date && formData.to_date) {
+if (formData.from_date == null || formData.to_date == null) {
   Swal.fire({
     title: 'Error!',
-    text: 'Please select the start date.',
+    text: 'Please select from and to dates.',
     icon: 'error',
     confirmButtonText: 'OK'
   });
   return;
 }
+
+// if (!formData.from_date && formData.to_date) {
+//   Swal.fire({
+//     title: 'Error!',
+//     text: 'Please select the start date.',
+//     icon: 'error',
+//     confirmButtonText: 'OK'
+//   });
+//   return;
+// }
 
 
 
@@ -234,7 +244,9 @@ if (!formData.from_date && formData.to_date) {
                
 
 
-                {formData.report_type == 1  && (
+                {formData.report_type == 1 && 
+                            Array.isArray(data.total_receipt_amounts) && 
+                            Array.isArray(data.total_payment_amounts) && (
                     <div className="mt-4">
                        <>
                         <button className='btn btn-success' onClick={() => exportToExcel(data)}>Export to Excel</button>

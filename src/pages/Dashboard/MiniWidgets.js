@@ -21,14 +21,14 @@ const MiniWidgets = ({ reports }) => {
                 </div>
               </div>
             </CardBody>
-
+{/* 
             <CardBody className="border-top py-3">
               <div className="text-truncate">
                 <span className="badge bg-success-subtle text-success font-size-11 me-1" onClick={() => navigate(report.desc)}>
                     Know More <i className="mdi mdi-arrow-right"></i>
                 </span>
               </div>
-            </CardBody>
+            </CardBody> */}
           </Card>
         </Col>
       ))}

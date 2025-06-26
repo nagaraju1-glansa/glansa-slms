@@ -26,7 +26,6 @@ class SidebarContent extends Component {
       pathName: this.props.router.location.pathname,
     };
 
-    console.log(this.props);
   }
   
 
@@ -100,6 +99,122 @@ class SidebarContent extends Component {
     const { t } = this.props;
     const roleId = localStorage.getItem('RoleId');
     const storedPermissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+
+    const menuConfig = [
+      // Dashboard
+      {
+        label: t('Dashboard'),
+        icon: 'ri-dashboard-line',
+        path: '/dashboard',
+        roles: ['all'],
+      },
+
+      // Roles (Superadmin only)
+      {
+        label: t('Role'),
+        icon: 'fas fa-user',
+        path: '/roles',
+        roles: [1],
+      },
+
+      // Company (Superadmin only)
+      {
+        label: t('Company'),
+        icon: 'fas fa-building',
+        path: '/company',
+        roles: [1],
+      },
+
+      // Employees (Superadmin only)
+      {
+        label: t('Employees'),
+        icon: 'fas fa-users',
+        roles: [1],
+        subMenu: [
+          { label: t('Employee List'), path: '/employees' },
+          { label: t('Employee Add'), path: '/employeeadd' },
+        ],
+      },
+
+      // Members (permission-based)
+      {
+        label: t('Members'),
+        icon: 'fas fa-users',
+        permissions: ['member-list', 'member-add', 'member-withdrawal'],
+        subMenu: [
+          { label: t('Members List'), path: '/members', permission: 'member-list' },
+          { label: t('Members Add'), path: '/membersadd', permission: 'member-add' },
+          { label: t('Members Withdrawal'), path: '/withdrawals', permission: 'member-withdrawal' },
+        ],
+      },
+
+      // Receipts (Member or permission-based)
+      {
+        label: t('Receipts'),
+        icon: 'fas fa-hand-holding-usd',
+        roles: ['Member'],
+        permissions: ['saving-receipt-list', 'loan-receipt-list', 'receipt-add'],
+        subMenu: [
+          { label: t('Saving Receipt'), path: '/savingreceipts', permission: 'saving-receipt-list' },
+          { label: t('Loan Receipt'), path: '/loanreceipts', permission: 'loan-receipt-list' },
+          { label: t('Receipt Add'), path: '/receiptsadd', permission: 'receipt-add' },
+        ],
+      },
+
+      // Payment (Member role or permission)
+      // {
+      //   label: t('Payment'),
+      //   icon: 'fas fa-hand-holding-usd',
+      //   roles: ['Member'],
+      //   permissions: ['payment-add', 'payment-list'],
+      //   subMenu: [
+      //     { label: t('To Saving'), path: '/savingspayment', permission: 'payment-add' },
+      //     { label: t('To Loan'), path: '/loanpayment', permission: 'payment-add' },
+      //   ],
+      // },
+
+      // Loan (Member or permission)
+      {
+        label: t('Loan'),
+        icon: 'fas fa-money-bill-wave',
+        roles: ['Member'],
+        permissions: ['loan-add', 'loan-list'],
+        subMenu: [
+          { label: t('Loan List'), path: '/loans', permission: 'loan-list' },
+          { label: t('Loan Add'), path: '/loanadd', permission: 'loan-add' },
+        ],
+      },
+
+      // Payments (non-member with permission)
+      {
+        label: t('Payments'),
+        icon: 'fas fa-money-bill-wave',
+        permissions: ['payment-add', 'payment-list'],
+        subMenu: [
+          { label: t('Payments List'), path: '/payments', permission: 'payment-list' },
+          { label: t('Payments Add'), path: '/paymentsadd', permission: 'payment-add' },
+        ],
+      },
+
+      // Reports
+      {
+        label: t('Reports'),
+        icon: 'ri-dashboard-line',
+        path: '/reports',
+        permissions: ['reports'],
+      },
+
+      // Interest on Savings
+      {
+        label: t('Interest On Savings'),
+        icon: 'ri-dashboard-line',
+        path: '/interestrun',
+        permissions: ['interest-process'],
+      },
+    ];
+
+
+
     return (
       <React.Fragment>
         <div id="sidebar-menu">
@@ -107,14 +222,62 @@ class SidebarContent extends Component {
           <ul className="metismenu list-unstyled" id="side-menu">
             <li className="menu-title">{t('Menu')}</li>
 
-            <li>
+            {/* <li>
               <Link id="menu-dashboard" to="/dashboard" className="waves-effect">
                 <i className="ri-dashboard-line"></i>
                 <span className="ms-1">{t('Dashboard')}</span>
               </Link>
-            </li>
+            </li> */}
+
+            
+  {menuConfig.map((item, index) => {
+    const numericRoleId = Number(roleId); // ensures you're comparing numbers
+    const hasRole = item.roles?.includes('all') || item.roles?.includes(numericRoleId);
+    const hasPermission = item.permissions?.some(p => storedPermissions.includes(p));
+    
+    // show if role matches or permission matches
+    if ((hasRole || hasPermission) && roleId != 'Member' && roleId != '0' ) {
+      return (
+        <li key={index}>
+          {item.subMenu ? (
+            <>
+              <Link to="#" className="has-arrow waves-effect">
+                <i className={item.icon}></i>
+                <span className="ms-1">{item.label}</span>
+              </Link>
+              <ul className="sub-menu">
+                {item.subMenu.map((sub, subIndex) => {
+                  const canShow =
+                    !sub.permission || storedPermissions.includes(sub.permission);
+                  return canShow ? (
+                    <li key={subIndex}>
+                      <Link to={sub.path}>{sub.label}</Link>
+                    </li>
+                  ) : null;
+                })}
+              </ul>
+            </>
+          ) : (
+            <Link to={item.path} className="waves-effect">
+              <i className={item.icon}></i>
+              <span className="ms-1">{item.label}</span>
+            </Link>
+          )}
+        </li>
+      );
+    }
+
+    return null;
+  })}
+
              {roleId == 'Member' && (
               <>
+              <li>
+                  <Link id="menu-reports" to="/dashboard" className="waves-effect">
+                    <i className="fas fa-user"></i>
+                    <span className="ms-1">{t('Dashboard')}</span>
+                  </Link>
+                </li>
                 <li className="menu-title">{t('Receipts')}</li>
 
                 <li>
@@ -151,36 +314,60 @@ class SidebarContent extends Component {
                     </li>
               </>
             )}
-            {roleId == 1 && (
-              <>
-              <li>
-                <Link id="menu-reports"  to="/roles" className="waves-effect">
-                  <i className="fas fa-user"></i>
-                  <span className="ms-1">{t('Role')}</span>
-                </Link>
-              </li>
-              <li>
-                <Link id="menu-reports"  to="/company" className="waves-effect">
-                  <i className="fas fa-building"></i>
-                  <span className="ms-1">{t('Company')}</span>
-                </Link>
-              </li>
-              <li>
-                <Link id="menu-members" to="/#" className="has-arrow waves-effect">
-                  <i className="fas fa-users"></i>
-                  <span className="ms-1">{t('Employees')}</span>
-                </Link>
-                <ul className="sub-menu">
-                  <li><Link to="/employees">{t('Employee List')}</Link></li>
-                  <li><Link to="/employeeadd">{t('Employee Add')}</Link></li>
-                </ul>
-              </li>
-            </>
-            )}
-            
 
-           {(roleId == 1 || roleId == 2 || roleId == 3) && (
+            {roleId == '0' && (
               <>
+               <li>
+                  <Link id="menu-reports" to="/dashboard" className="waves-effect">
+                    <i className="fas fa-user"></i>
+                    <span className="ms-1">{t('Dashboard')}</span>
+                  </Link>
+                </li>
+                <li>
+                    <Link id="menu-members" to="/#" className="has-arrow waves-effect">
+                      <i className="fas fa-building"></i>
+                      <span className="ms-1">{t('Main Companys')}</span>
+                    </Link>
+                    <ul className="sub-menu">
+                      <li><Link to="/glansa-main-companies">{t('Company List')}</Link></li>
+                      <li><Link to="/add-main-company">{t('Company Add')}</Link></li>
+                    </ul>
+                  </li>
+                <li>
+                  <Link id="menu-reports" to="/company-payments" className="waves-effect">
+                    <i className="fas fa-money-bill"></i>
+                    <span className="ms-1">{t('Company Payments')}</span>
+                  </Link>
+                </li>
+              </>
+            )}
+            {/* {roleId == 1 ? (
+      <>
+        <li>
+          <Link id="menu-reports" to="/roles" className="waves-effect">
+            <i className="fas fa-user"></i>
+            <span className="ms-1">{t('Role')}</span>
+          </Link>
+        </li>
+        <li>
+          <Link id="menu-reports" to="/company" className="waves-effect">
+            <i className="fas fa-building"></i>
+            <span className="ms-1">{t('Company')}</span>
+          </Link>
+        </li>
+        <li>
+          <Link id="menu-members" to="/#" className="has-arrow waves-effect">
+            <i className="fas fa-users"></i>
+            <span className="ms-1">{t('Employees')}</span>
+          </Link>
+          <ul className="sub-menu">
+            <li><Link to="/employees">{t('Employee List')}</Link></li>
+            <li><Link to="/employeeadd">{t('Employee Add')}</Link></li>
+          </ul>
+        </li>
+      </>
+    ) : (
+       <>
               {(storedPermissions.includes("member-list") ||
               storedPermissions.includes("member-add")
               ) && (
@@ -296,8 +483,13 @@ class SidebarContent extends Component {
                 </li>
                 )}
             </>
+    )} */}
+            
+
+           {/* {(roleId == 1 || roleId == 2 || roleId == 3) && (
+             
             )}
-           
+            */}
 
           </ul>
         </div>

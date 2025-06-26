@@ -34,7 +34,7 @@ const SavingReceiptsList = () => {
     { name: 'ReceiptId', selector: row => row.receipts_id, sortable: true },
     { name: 'Receipt Date', selector: row => row.receipt_date, sortable: true },
     { name: 'Member Name', selector: row => row.membername, sortable: true },
-    { name: 'Member No.', selector: row => row.m_no, sortable: true },
+    { name: 'Member No.', selector: row => row.member?.member_id ?? '', sortable: true },
     { name: 'Amount', selector: row => row.amount, sortable: true },
     { name: 'Latefee', selector: row => row.latefee, sortable: true },
     { name: 'TotalPaid', selector: row => row.totalamount, sortable: true },

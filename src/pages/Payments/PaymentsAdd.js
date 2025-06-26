@@ -92,7 +92,7 @@ const PaymentsAdd = () => {
 
   const optionsSelect = mno.map((item) => ({
     value: item.m_no_encpt,
-    label: item.m_no,
+    label: item.member_id,
     membername: item.name,
   }));
 

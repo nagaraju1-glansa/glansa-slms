@@ -1,7 +1,7 @@
 import { API_BASE_URL, getToken, setToken } from "./ApiConfig";
 
-// const showLoader = () => document.body.classList.add('loading');
-// const hideLoader = () => document.body.classList.remove('loading');
+const showLoader = () => document.body.classList.add('loading');
+const hideLoader = () => document.body.classList.remove('loading');
 
 const refreshAccessToken = async () => {
   const token = getToken();
@@ -40,7 +40,7 @@ export const CustomFetch = async (endpoint, options = {}, retry = true) => {
     ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
   };
 
-  // showLoader(); // 
+  showLoader(); // 
 
   try {
     let response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -82,6 +82,6 @@ export const CustomFetch = async (endpoint, options = {}, retry = true) => {
     throw err;
   }
    finally {
-    // hideLoader(); // hide loader after request or error
+    hideLoader(); // hide loader after request or error
   }
 };

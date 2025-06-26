@@ -34,7 +34,7 @@ useEffect(() => {
 
 const optionsSelect = members.map(item => ({
   value: item.m_no_encpt,
-  label: item.m_no,
+  label: item.member_id,
   membername: item.name,
 }));
 
@@ -71,6 +71,7 @@ const fetchMemberDetails = async (id) => {
     wstatusdate: data.wstatusdate,
     wstatus: data.wstatus,
     mno: data.m_no,
+    member_id: data.member_id,
     membername: data.name,
     ...(data.savings && data.savings.length > 0
       ? {
@@ -272,8 +273,8 @@ const handleChange = (valueOrEvent, actionMeta) => {
                 {id ? (
                   <Input
                     type="text"
-                    name="mno"
-                    value={formData.mno || ''}
+                    name="member_id"
+                    value={formData.member_id || ''}
                     onChange={handleChange}
                     readOnly
                   />

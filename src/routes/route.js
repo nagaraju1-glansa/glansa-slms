@@ -59,15 +59,14 @@ const AppRoute = (props) => {
       .then((data) => {
          console.log(localStorage.getItem('RoleId'));
          const permissions =[];
-        if(localStorage.getItem('RoleId') != 'Member') {
+        if(localStorage.getItem('RoleId') != 'Member' && localStorage.getItem('RoleId') != '0') {
           const permissions = data.user.permissions || [];
           localStorage.setItem('permissions', JSON.stringify(permissions));
           setHasPermission(!props.permission || permissions.includes(props.permission));
         }
         setIsValid(true);
         setAuthChecked(true);
-       
-        console.log(permissions);
+      
         
       })
       .catch(() => {
@@ -88,7 +87,7 @@ const AppRoute = (props) => {
   }
 
   
-  if (!hasPermission && localStorage.getItem('RoleId') != 'Member') {
+  if (!hasPermission && localStorage.getItem('RoleId') != 'Member' && localStorage.getItem('RoleId') != '0') {
     return <Navigate to="/dashboard" replace />;
   }else{
     return <>{props.children}</>;

@@ -141,7 +141,7 @@ const Role = () => {
              <div className='page-title-box d-sm-flex align-items-center justify-content-between'>
               <h4 className="mb-0">Roles</h4>
               <button type="button" className="btn btn-success waves-effect waves-light"  onClick={()=> navigate('/rolemanager') }>
-                  <i className="fas fa-plus align-middle me-2"></i> Add Permissions 
+                  <i className="fas fa-plus align-middle me-2"></i> Manage Permissions 
               </button>
           </div>
 

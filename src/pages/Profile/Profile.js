@@ -84,7 +84,7 @@ const ProfilePage = () => {
                 <img
                         src={
                             member.image
-                            ? `${member.image}`
+                            ? `${process.env.REACT_APP_APIURL_IMAGE}employees/${member.image}`
                             : ""
                         }
                         alt="profile"
@@ -92,7 +92,7 @@ const ProfilePage = () => {
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                             e.target.onerror = null;
-                            e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                           e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
                         }}
                         />
               <h4>{member.name} {member.surname}</h4>

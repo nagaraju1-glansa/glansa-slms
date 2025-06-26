@@ -28,10 +28,10 @@ class NotificationDropdown extends Component {
         return (
             <React.Fragment>
                 <Dropdown isOpen={this.state.menu} toggle={this.toggle} className="d-inline-block">
-                    <DropdownToggle tag="button" className="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown">
+                    {/* <DropdownToggle tag="button" className="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown">
                         <i className="ri-notification-3-line"></i>
                         <span className="noti-dot"></span>
-                    </DropdownToggle>
+                    </DropdownToggle> */}
                     <DropdownMenu className="dropdown-menu-end dropdown-menu-lg p-0"
                         aria-labelledby="page-header-notifications-dropdown">
                         <div className="p-3">

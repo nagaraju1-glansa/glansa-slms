@@ -41,7 +41,7 @@ const ReceiptPrint = ({ receiptData, show, onClose }) => {
                       R.NO: <span>{receiptData.cvmacs_rcpt_number}</span>
                     </p>
                     <p>
-                      M.No: <span>{receiptData.m_no}</span>
+                      M.No: <span>{receiptData.member_id}</span>
                     </p>
                   </div>
                   <div className="col-7 text-start ps-4">

@@ -33,19 +33,27 @@ const [errors, setErrors] = useState({});
 
   useEffect(() => {
 
+    if (id) {
+    fetchLoanDetails(id);
+    } else {
+      setFormData(initialState); // Reset form for "Add" mode
+    }
+
     CustomFetch("/mno")
       .then((res) => res.json())
       .then((data) => {
         // setReceipts(data);
         console.log(data);
         const selectOptions = data.map((item) => {
-            const mNoStr = item.m_no != null ? item.m_no.toString() : '';
+            const mNoStr = item.member_id != null ? item.member_id.toString() : '';
             const mNoStrVal = item.m_no_encpt != null ? item.m_no_encpt.toString() : '';
 
             return {
                 label: mNoStr,
                 value: mNoStrVal,
                 image: item.image ? item.image : '',
+                dateOfJoining: item.doj ? item.doj : '',
+
             };
         });
         setOptions(selectOptions);
@@ -57,11 +65,9 @@ const [errors, setErrors] = useState({});
     fetchDropdownOptions(54, setPurposeOptions);
     fetchDropdownOptions(68, setModeOfRepaymentOptions);
 
-    if (id) {
-      fetchLoanDetails(id);
-    }
 
-  }, []);
+
+  }, [id]);
 
 
 const fetchDropdownOptions = (parentId, setoptions) => {
@@ -205,6 +211,7 @@ const handleChange = (valueOrEvent, actionMeta) => {
       const selectedOption = options.find(option => option.value === String(value));
 
         updatedFormData.image = selectedOption ? selectedOption.image : null;
+        updatedFormData.dateOfJoining = selectedOption ? selectedOption.dateOfJoining : null;
 
   }
 
@@ -428,7 +435,7 @@ const handleClear = () => {
               {id ? (
                 <Input
                   type="text"
-                  value={formData.mno || ''}
+                  value={formData.member?.member_id || ''}
                   onChange={handleChange}
                   name="mno"
                   readOnly
@@ -465,18 +472,29 @@ const handleClear = () => {
             </div>
             </Col>
             <Col md={6} className='justify-content-center d-flex m-auto'>
-
-                    <img
-                        src={formData.image ? `${formData.image}` : ""}
+              {id ? (
+                <img
+                        src={formData.member?.image ? `${process.env.REACT_APP_APIURL_IMAGE}members/${formData.member.image}` : ""}
                         alt="profile"
                         className="rounded-circle img-fluid mb-3"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                           e.target.onerror = null;
-                          e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                          e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
                         }}
                       />
-
+                 ) : (
+                    <img
+                        src={formData.image ? `${process.env.REACT_APP_APIURL_IMAGE}members/${formData.image}` : ""}
+                        alt="profile"
+                        className="rounded-circle img-fluid mb-3"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                        onError={e => {
+                          e.target.onerror = null;
+                         e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
+                        }}
+                      />
+                        )}
             </Col>
           </Row>
           <div className="mb-3">

@@ -39,7 +39,7 @@ const goToPaymentsform = () => {
     { name: 'Payment_Date', selector: row => row.date, sortable: true },
     { name: 'Payment_Towards', selector: row => row.towards, sortable: true },
     { name: 'Payment_Mode', selector: row => row.modeofpmtname, sortable: true },
-    { name: 'M_No', selector: row => row.mno, sortable: true },
+    { name: 'M_No', selector: row =>  row.member?.member_id ?? '', sortable: true },
     { name: 'Account no', selector: row => row.acntno, sortable: true },
     { name: 'Amount', selector: row => row.amount, sortable: true },
     { name: 'EntryBy', selector: row => row.user && row.user.name ? row.user.name : '', sortable: true }

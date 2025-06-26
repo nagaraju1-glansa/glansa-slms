@@ -53,8 +53,8 @@ const Company = () => {
     form_fee: "5",
     loan_eligibility: "12",
     eligibility_amount: "3",
-   status: '1',
-    date: "",
+    status: '1',
+    date: new Date().toISOString().split('T')[0],
   });
 
   const handleChange = (e) => {
@@ -138,15 +138,15 @@ const Company = () => {
     }
 
     setFormData({
-      company_id: "",
+       company_id: "",
       name: "",
-      min_saving: "",
-      admission_fee: "",
-      form_fee: "",
-      loan_eligibility: "",
-      eligibility_amount: "",
-      status: "",
-      date: "",
+      min_saving: "100",
+      admission_fee: "150",
+      form_fee: "5",
+      loan_eligibility: "12",
+      eligibility_amount: "3",
+      status: '1',
+      date: new Date().toISOString().split('T')[0],
     });
   };
 

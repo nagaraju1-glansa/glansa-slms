@@ -99,6 +99,103 @@ const RevenueAnalyticsChart = () => {
   );
 };
 
+
+const GlansaRevenueAnalyticsChart = () => {
+  const [currentYearData, setCurrentYearData] = useState();
+  const [previousYearData, setPreviousYearData] = useState();
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const res = await CustomFetch(`/forglansa-companypayments-monthly`);
+        const data = await res.json();
+        const yearData = {
+          [currentYear]: new Array(12).fill(0),
+          [previousYear]: new Array(12).fill(0),
+        };
+        data.forEach((item) => {
+          const monthIndex = item.month - 1;
+          if (yearData[item.year]) {
+            yearData[item.year][monthIndex] = item.total_amount;
+          }
+        });
+        setCurrentYearData(yearData[currentYear]);
+        setPreviousYearData(yearData[previousYear]);
+      } catch (err) {
+        console.log(err, "Error found");
+      }
+    };
+    loadData();
+
+  }, []);
+
+  const series = [
+    {
+      name: currentYear,
+      type: "column",
+      data: currentYearData,
+    },
+    {
+      name: previousYear,
+      type: "line",
+      data: previousYearData,
+    },
+  ];
+
+  const options = {
+    chart: {
+      toolbar: {
+        show: false,
+      },
+    },
+    stroke: {
+      width: [0, 3],
+      curve: "smooth",
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "20%",
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+
+    legend: {
+      show: false,
+    },
+    colors: ["#5664d2", "#1cbb8c"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+  };
+
+  return (
+    <React.Fragment>
+      <ReactApexChart
+        options={options}
+        series={series}
+        type="line"
+        height={280}
+      />
+    </React.Fragment>
+  );
+};
+
 const SpakChart1 = () => {
   const series = [
     {
@@ -261,4 +358,4 @@ const SpakChart3 = () => {
   );
 };
 
-export { SpakChart1, SpakChart2, SpakChart3, RevenueAnalyticsChart };
+export { SpakChart1, SpakChart2, SpakChart3, RevenueAnalyticsChart, GlansaRevenueAnalyticsChart };

@@ -28,6 +28,7 @@ const CompanyDashboard = () => {
     const roleId = RoleId();
     const [company_id, setCompanyId] = useState([]);
     const [selectedCompany, setSelectedCompany] = useState('');
+    const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
     const [reports , setReports] = useState([
             { icon : "fas fa-users", title : "Total Active Members", value : "0", desc : "From previous period" },
@@ -53,6 +54,13 @@ const CompanyDashboard = () => {
                 try {
                     const res = await CustomFetch(`/dashboard`);
                     const data = await res.json();
+                    setSubscriptionStatus({
+                        name: data.name,
+                        status: data.subscription_status,
+                        startDate: data.subscription_start,
+                        endDate: data.subscription_end,
+                    });
+
                      setReports([
                 {
                     icon: "fas fa-users",
@@ -64,7 +72,7 @@ const CompanyDashboard = () => {
                     icon: "ri-briefcase-4-line",
                     title: "Today Saving Collections",
                     value: `₹ ${data.monthly_savings}`,
-                    desc: "#"
+                    desc: "/members"
                 },
                 {
                     icon: "ri-briefcase-4-line",
@@ -102,22 +110,55 @@ const CompanyDashboard = () => {
 
     
 
-    
-        useEffect(() => {
-          const fetchCompanys = async () => {
-            try {
-              const response = await CustomFetch(`/auth/companys`);
-              const data = await response.json();
-              setCompanyId(data);
-              console.log("Fetched Payments Data:", data);
+    useEffect(() => {
+  const fetchCompanies = async () => {
+    try {
+      const response = await CustomFetch(`/auth/companys`);
+      const data = await response.json();
+      setCompanyId(data);
+
+      // Check for saved company ID in localStorage
+      const savedCompanyId = localStorage.getItem('selectedCompanyId');
+
+      if (savedCompanyId) {
+        setSelectedCompany(savedCompanyId);
+      } else if (data.length > 0) {
+        // Default to first company if nothing is saved
+        const firstCompanyId = data[0].company_id;
+        setSelectedCompany(firstCompanyId);
+        localStorage.setItem('selectedCompanyId', firstCompanyId);
+
+        // Optional: send it to backend right away
+        await CustomFetch('/switch-company', {
+          method: 'POST',
+          body: JSON.stringify({ company_id: firstCompanyId }),
+        });
+
+        // Optional: reload to reflect switch
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Error fetching companies:", err);
+    }
+  };
+
+  fetchCompanies();
+}, []);
+        // useEffect(() => {
+        //   const fetchCompanys = async () => {
+        //     try {
+        //       const response = await CustomFetch(`/auth/companys`);
+        //       const data = await response.json();
+        //       setCompanyId(data);
+        //       console.log("Fetched Payments Data:", data);
       
-            } catch (err) {
-              console.error("Error fetching payments:", err);
-            }
-          };
+        //     } catch (err) {
+        //       console.error("Error fetching payments:", err);
+        //     }
+        //   };
       
-          fetchCompanys();
-        }, []);
+        //   fetchCompanys();
+        // }, []);
 
         const handler = (e) => {
           const { name, value } = e.target;
@@ -152,7 +193,7 @@ const CompanyDashboard = () => {
                                 onChange={handler}
                                 value={selectedCompany}
                               >
-                                <option value="">---Select Company Name---</option>
+                                {/* <option value="">---Select Company Name---</option> */}
                                 {company_id.map((company) => (
                                   <option key={company.company_id} value={company.company_id}>
                                     {company.name}
@@ -175,6 +216,57 @@ const CompanyDashboard = () => {
                         </Col>
 
                         <Col xl={4}>
+
+                        {subscriptionStatus && (
+                            <Card className="mb-3 bg-light">
+                                <CardBody>
+                                {(() => {
+                                    const now = new Date();
+                                    const end = new Date(subscriptionStatus.endDate);
+                                    const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+                                    const endFormatted = end.toLocaleDateString('en-IN', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    });
+
+                                    if (subscriptionStatus.status !== 1) {
+                                    return (
+                                        <h5 className="text-danger">
+                                        🔒 Subscription is <b>inactive</b><br />
+                                        Expiry Date: <b>{endFormatted}</b>
+                                        </h5>
+                                    );
+                                    }
+
+                                    if (diffDays <= 0) {
+                                    return (
+                                        <h5 className="text-danger">
+                                        ❌ Subscription has <b>expired</b><br />
+                                        Expired on: <b>{endFormatted}</b>
+                                        </h5>
+                                    );
+                                    } else if (diffDays <= 15) {
+                                    return (
+                                        <h5 className="text-warning">
+                                        ⚠️ Subscription will expire in <b>{diffDays} day{diffDays !== 1 ? 's' : ''}</b><br />
+                                        Expiry Date: <b>{endFormatted}</b>
+                                        </h5>
+                                    );
+                                    } else {
+                                    return (
+                                        <h5 className="text-success">
+                                        ✅ Subscription is active<br />
+                                        Expiry Date: <b>{endFormatted}</b> (<b>{diffDays}</b> days left)
+                                        </h5>
+                                    );
+                                    }
+                                })()}
+                                </CardBody>
+                            </Card>
+                            )}
+
+
                             <Card className="mb-0">
                                 <CardBody>
                                     <FullCalendar

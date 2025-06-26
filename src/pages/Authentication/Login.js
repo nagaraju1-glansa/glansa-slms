@@ -25,6 +25,13 @@ const Login = () => {
   }
 });
 
+useEffect(() => {
+  if (loginType === 'member') {
+    setValue('member_no', '4');
+    setValue('aadhar_no', '9017 0989 9897');
+  }
+}, [loginType, setValue]);
+
   const onSubmit = (data) => {
     const payload = loginType === 'company' 
       ? { username: data.username, password: data.password, type: loginType } 
@@ -38,16 +45,22 @@ const Login = () => {
       },
       body: JSON.stringify(payload),
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Login failed');
-      return res.json();
-    })
+    .then(async (res) => {
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      // Show backend error message (e.g. subscription expired)
+      throw new Error(responseData.message || 'Login failed');
+    }
+
+    return responseData;
+  })
     .then(data => {
       if (data.access_token) {
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('companyId', data.user.company_id);
         localStorage.setItem('RoleId', data.user.role_id);
-        localStorage.setItem('UserType', data.user.usertype);
+        localStorage.setItem('UserType', data.user.name);
         localStorage.setItem('selectedCompanyId', 0);
          if (loginType === 'member') {
             localStorage.setItem('mencpt', data.user.m_no_encpt);
@@ -61,7 +74,7 @@ const Login = () => {
     .catch(error => {
       Swal.fire({
         title: 'Login Failed',
-        text: 'Please check your credentials.',
+        text: error.message,
         icon: 'error',
         confirmButtonText: 'Try Again'
       });
@@ -75,7 +88,7 @@ const Login = () => {
           <div className="authentication-page-content p-4 d-flex align-items-center min-vh-100">
             <div className="w-100">
               <Row className="justify-content-center">
-                <Col lg={9}>
+                <Col lg={10}>
                   <div className="text-center">
                     <Link to="/">
                       <img src={logodark} alt="" height="50" className="auth-logo logo-dark mx-auto" />
@@ -107,15 +120,15 @@ const Login = () => {
                         {/* Demo Login Buttons */}
                         <div className="mb-3 text-center">
                           <span className="me-2">Try Demo:</span>
-                          <Button size="sm" color="info" className="me-2" onClick={() => {
+                          <Button size="sm" color="info" className="me-2 mb-1" onClick={() => {
                             setValue("username", "superadmin");
                             setValue("password", "superadmin");
                           }}>SuperAdmin</Button>
-                          <Button size="sm" color="primary" className="me-2" onClick={() => {
+                          <Button size="sm" color="primary" className="me-2 mb-1" onClick={() => {
                             setValue("username", "admin");
                             setValue("password", "admin123");
                           }}>Admin</Button>
-                          <Button size="sm" color="success" onClick={() => {
+                          <Button size="sm" color="success" className=" mb-1" onClick={() => {
                             setValue("username", "employee");
                             setValue("password", "employee123");
                           }}>Employee</Button>
@@ -175,7 +188,11 @@ const Login = () => {
                           />
                           {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                         </div>
-                        
+                        <div className="mt-4 text-center">
+                          <Link to="/forgot-password?type=company" className="text-muted">
+                            <i className="mdi mdi-lock me-1"></i> Forgot your password?
+                          </Link>
+                        </div>
                       </div>
                       {/* Member Login */}
                       <div className={`login-section ${loginType !== 'member' ? 'hidden' : ''}`}>
@@ -186,6 +203,7 @@ const Login = () => {
                             name="member_no"
                             control={control}
                             rules={{ required: loginType === 'member' && "Member No. is required" }}
+                            value = "4"
                             render={({ field }) => (
                               <Input
                                 id="member_no"
@@ -216,17 +234,18 @@ const Login = () => {
                           />
                           {errors.aadhar_no && <div className="invalid-feedback">{errors.aadhar_no.message}</div>}
                         </div>
+                        {/* <div className="mt-4 text-center">
+                          <Link to="/forgot-password?type=member" className="text-muted">
+                            <i className="mdi mdi-lock me-1"></i> Forgot your password?
+                          </Link>
+                        </div> */}
                       </div>
 
                       <div className="mt-4 text-center">
                         <Button color="primary" className="w-md" type="submit">Log In</Button>
                       </div>
 
-                      <div className="mt-4 text-center">
-                        <Link to="/forgot-password" className="text-muted">
-                          <i className="mdi mdi-lock me-1"></i> Forgot your password?
-                        </Link>
-                      </div>
+                      
                     </form>
                   </div>
 

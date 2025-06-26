@@ -34,7 +34,7 @@ const LoanReceiptslist = () => {
   const columns = [
     { name: 'ReceiptId', selector: row => row.receipts_id, sortable: true },
     { name: 'Receipt Date', selector: row => row.receipt_date, sortable: true },
-    { name: 'MNO', selector: row => row.m_no, sortable: true },
+    { name: 'MNO', selector: row => row.member?.member_id ?? '', sortable: true },
     { name: 'Name', selector: row => row.membername, sortable: true },
     { name: 'Towards', selector: row => row.towards, sortable: true },
     // { name: 'lastpaiddate', selector: row => row.lastpaiddate, sortable: true },

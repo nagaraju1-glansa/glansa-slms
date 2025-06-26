@@ -78,15 +78,15 @@ const EmployeeView = () => {
                 <img
                         src={
                             member.image
-                            ? `${process.env.REACT_APP_APIURL}storage/uploads/${member.image}`
-                            : "https://i.pravatar.cc/150?img=5"
+                            ? `${process.env.REACT_APP_APIURL_IMAGE}employees/${member.image}`
+                            : `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`
                         }
                         alt="profile"
                         className="rounded-circle img-fluid mb-3"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={e => {
                             e.target.onerror = null;
-                            e.target.src = "https://i.pravatar.cc/150?img=5";
+                           e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
                         }}
                         />
               <h4>{member.name} {member.surname}</h4>

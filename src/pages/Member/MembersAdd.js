@@ -14,6 +14,7 @@ import {
   Progress,
   Container,
 } from "reactstrap";
+import Select from 'react-select';
 import classnames from "classnames";
 import { Link, useParams , useNavigate} from "react-router-dom";
 
@@ -21,6 +22,13 @@ import { Link, useParams , useNavigate} from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { CustomFetch } from "../ApiConfig/CustomFetch";
 import Swal from "sweetalert2";
+import { RoleId } from '../ApiConfig/ApiConfig';
+import {
+  validatePhoneNumber,
+  validateTextOnly,
+  validateAadhaar,
+  validatePAN
+} from "../../assets/js/validation";
 
 const MembersAdd = () => {
   const [breadcrumbItems] = useState([
@@ -34,13 +42,15 @@ const MembersAdd = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
      femalecnt:0,
-     malecnt:0
+     malecnt:0,
   });
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null);
   const [errors, setErrors] = useState({});
 
   const [sameAsCurrent, setSameAsCurrent] = useState(false);
+  const [options, setOptions] = useState([]);
+  const roleId = RoleId();
 
   // Fetch data for the existing member if `id` exists in the URL
   useEffect(() => {
@@ -64,24 +74,57 @@ const MembersAdd = () => {
     }
   }, [id]);
 
+   useEffect(() => {
+  
+      CustomFetch("/mno")
+        .then((res) => res.json())
+        .then((data) => {
+          // setReceipts(data);
+          console.log(data);
+          const selectOptions = data.map((item) => {
+              const mNoStr = item.m_no != null ? item.m_no.toString() : '';
+              const mNoStrVal = item.m_no_encpt != null ? item.m_no_encpt.toString() : '';
+  
+              return {
+                  label: mNoStr,
+                  value: mNoStrVal,
+                  image: item.image ? item.image : '',
+              };
+          });
+          setOptions(selectOptions);
+        })
+        .catch((err) => console.error(err));
+    }, []);
+
   const toggleTab = (tab) => {
     if (activeTab !== tab && tab >= 1 && tab <= 4) {
       setActiveTab(tab);
     }
   };
 
-const handleInput = (e) => {
+const handleInput = (e, actionMeta = null) => {
+  // Handle react-select
+  if (actionMeta) {
+    const { name } = actionMeta;
+    setFormData(prev => ({
+      ...prev,
+      [name]: e.label, // or use e.value depending on what you need
+    }));
+    return;
+  }
+
+  // Handle normal HTML input
   const { name, type, value, checked } = e.target;
   let updated = {};
 
-   if (type == 'checkbox') {
+  if (type === 'checkbox') {
     updated = {
       ...formData,
-      [name]: checked ? 1 : 0, // ✅ Use 1 for checked, 0 for unchecked
+      [name]: checked ? 1 : 0,
     };
 
-      if (name == "sameAsCurrent") {
-      if (value == 1) {
+    if (name === "sameAsCurrent") {
+      if (checked) {
         updated = {
           ...updated,
           prmnthno: formData.tmphno,
@@ -93,20 +136,61 @@ const handleInput = (e) => {
         };
       }
     }
-
-    
-  }
-  else {
+  } else {
     updated = {
       ...formData,
       [name]: value,
     };
   }
 
+  if (name === 'malecnt' || name === 'femalecnt') {
+    const male = name === 'malecnt' ? Number(value || 0) : Number(formData.malecnt || 0);
+    const female = name === 'femalecnt' ? Number(value || 0) : Number(formData.femalecnt || 0);
+    updated.tfamilymembers = male + female;
+  }
+
   setFormData(updated);
   console.log(updated);
- 
 };
+
+
+// const handleInput = (e) => {
+//   const { name, type, value, checked } = e.target;
+//   let updated = {};
+
+//    if (type == 'checkbox') {
+//     updated = {
+//       ...formData,
+//       [name]: checked ? 1 : 0, // ✅ Use 1 for checked, 0 for unchecked
+//     };
+
+//       if (name == "sameAsCurrent") {
+//       if (value == 1) {
+//         updated = {
+//           ...updated,
+//           prmnthno: formData.tmphno,
+//           prmntlandmark: formData.tmplandmark,
+//           prmntcolony: formData.tmpcolony,
+//           prmntdist: formData.tmpdist,
+//           prmntmandal: formData.tmpmandal,
+//           prmntpin: formData.tmppin,
+//         };
+//       }
+//     }
+
+    
+//   }
+//   else {
+//     updated = {
+//       ...formData,
+//       [name]: value,
+//     };
+//   }
+
+//   setFormData(updated);
+//   console.log(updated);
+ 
+// };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -138,6 +222,23 @@ const handleInput = (e) => {
       if (!(doj || "").trim()) newErrors.doj = "Date of Join is required.";
       if (!(surname || "").trim()) newErrors.surname = "Surname is required.";
       if (!(aadhaarno || "").trim()) newErrors.aadhaarno = "Adhaar number is required.";
+
+      
+            if (!validatePhoneNumber(formData.mobile1) && formData.mobile1) {
+              newErrors.mobile1 = "Enter a valid 10-digit mobile number.";
+            }
+      
+            if (!validateTextOnly(formData.name)) {
+              newErrors.name = "Name should contain only letters.";
+            }
+      
+            if (!validateAadhaar(formData.aadhaarno) && formData.aadhaarno) {
+              newErrors.aadhaarno = "Enter a valid 12-digit Aadhaar number.";
+            }
+      
+            if (!validatePAN(formData.panno)  && formData.panno ) {
+              newErrors.panno = "Enter a valid PAN number (e.g. ABCDE1234F).";
+            }
 
 
       if (Object.keys(newErrors).length > 0) {
@@ -200,7 +301,8 @@ const handleInput = (e) => {
         }).then((result) => {
           if (result.isConfirmed) {
             setPreview('');
-            navigate('/members');
+            roleId == 'Member' ? window.location.replace(`/memberview/${id}`) : navigate('/members');
+            // navigate('/members');
           }
         });
       }
@@ -413,7 +515,7 @@ const handleInput = (e) => {
                                 />
 
                               </div>
-                              <div className="mb-3">
+                              <div className="mb-3" style={{ display: "none" }}>
                                 <Label
                                   className="form-label"
                                   htmlFor="landline"
@@ -464,7 +566,16 @@ const handleInput = (e) => {
                                 {formData.image &&(
                                   <div className="mt-3">
                                     <p>Image :</p>
-                                    <img src={formData.image} alt="Preview" style={{ maxWidth: '300px', height: '300px' }} />
+                                    <img
+                                        src={
+                                          formData.image
+                                            ? `${process.env.REACT_APP_APIURL_IMAGE}members/${formData.image}`
+                                            : `${process.env.REACT_APP_APIURL_IMAGE}/user.jpg`
+                                        }
+                                        alt="Preview"
+                                        style={{ maxWidth: '300px', height: '300px' }}
+                                      />
+
                                   </div>
                                 )}
                               
@@ -534,23 +645,24 @@ const handleInput = (e) => {
                                   <option value="Driver">Driver</option>
                                 </select>
                               </div>
-                            <div className="mb-3">
+                            <div className="mb-3" style={{ display: "none" }}>
                                 <Label>Select M.Designation</Label>
-                                <select
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  id="designation"
+                                  name="designation"
+                                  value={formData.designation == null ? "Member" : formData.designation}
+                                  onChange={handleInput}
+                                />
+                                {/* <select
                                   className="form-select"
                                   name="designation"
                                   value={formData.designation || ""}
                                   onChange={handleInput}
                                 >
-                                  <option value="">--Select M.Designation--</option>
                                   <option value="Member">Member</option>
-                                  <option value="Director">Director</option>
-                                  <option value="Employee">Employee</option>
-                                  <option value="Treasurer">Treasurer</option>
-                                  <option value="Secretary">Secretary</option>
-                                  <option value="Vice President">Vice President</option>
-                                  <option value="President">President</option>
-                                </select>
+                                </select> */}
                               </div>
                                <div className="col-12 mb-3">
                                 <Row>
@@ -672,8 +784,14 @@ const handleInput = (e) => {
                                 </select>
                               </div>
                               <div className="mb-3">
-                                <Label>Select M.no</Label>
-                                <select
+                                <Label>Referal M.no</Label>
+                                <Select
+                                  options={options}
+                                  value={formData.refmno ? options.find(option => option.label == formData.refmno) : null}  
+                                  onChange={handleInput}
+                                  name="refmno"
+                                />
+                                {/* <select
                                   className="form-select"
                                   name="mno"
                                   value={formData.mno || ""}
@@ -682,10 +800,10 @@ const handleInput = (e) => {
                                   <option value="">Default</option>
                                   <option value="M.no">M.no</option>
                                   <option value="None">None</option>
-                                </select>
+                                </select> */}
                               </div>
                                
-                              <div className="mb-3">
+                              {/* <div className="mb-3">
                                 <Label className="form-label" htmlFor="referal">
                                   Enter Ref Mobile no
                                 </Label>
@@ -697,7 +815,7 @@ const handleInput = (e) => {
                                   value={formData.refmno || ""}
                                   onChange={handleInput}
                                 />
-                              </div>
+                              </div> */}
                             </Col>
 
                           </Row>

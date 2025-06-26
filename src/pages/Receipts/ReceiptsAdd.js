@@ -85,7 +85,8 @@ const initialState = {
 
   const optionsSelect = mno.map((item) => ({
     value: item.m_no_encpt,
-    label: item.m_no,
+    label: item.member_id,
+    m_no: item.m_no,
     membername: item.name,
     image: item.image
   }));
@@ -254,7 +255,7 @@ total = amount + latefee + interest;
     
         if(selectedMno){
             if(value === '47'){
-              loanget(selectedMno.label);
+              loanget(selectedMno.m_no);
             }
 
             if(value === '46'){
@@ -451,13 +452,13 @@ total = amount + latefee + interest;
                   <div className='page-title-box d-sm-flex align-items-center justify-content-between'>
                       <h4 className="mb-0">Receipts Details</h4>
                      <img
-                        src={formData.image ? `${formData.image}` : ""}
+                        src={formData.image ? `${process.env.REACT_APP_APIURL_IMAGE}members/${formData.image}` : ""}
                         alt="profile"
                         className="rounded-circle img-fluid mb-3"
                         style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                         onError={e => {
                           e.target.onerror = null;
-                          e.target.src = "http://127.0.0.1:8000/storage/uploads/user.jpg";
+                          e.target.src = `${process.env.REACT_APP_APIURL_IMAGE}user.jpg`;
                         }}
                       />
                   </div>
@@ -496,6 +497,7 @@ total = amount + latefee + interest;
                           onChange={handleChange}
                           placeholder="Enter Member Name"
                           invalid={!!errors.membername}
+                          readOnly
                         />
                         {errors.membername && <div className="text-danger">{errors.membername}</div>}
                       </Col>

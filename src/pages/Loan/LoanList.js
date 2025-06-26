@@ -80,7 +80,7 @@ function LoanList() {
 
   const columns = [
     { name: 'Loan ID', selector: row => row.loan_id, sortable: true },
-    { name: 'Member No.', selector: row => row.mno, sortable: true },
+    { name: 'Member No.', selector: row => row.member?.member_id ?? '', sortable: true },
     { name: 'Member Name', selector: row => row.mname, sortable: true },
     {
           name: 'Account No.',
