@@ -218,7 +218,7 @@ const CompanyDashboard = () => {
                         <Col xl={4}>
 
                         {subscriptionStatus && (
-                            <Card className="mb-3 bg-light">
+                            <Card className="mb-3 bg-light d-none" style={{ display: "none" }}>
                                 <CardBody>
                                 {(() => {
                                     const now = new Date();

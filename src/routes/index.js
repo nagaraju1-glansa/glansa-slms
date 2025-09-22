@@ -63,9 +63,9 @@ const authProtectedRoutes = [
 	{ path: "/loanview/:id", component: <LoanView /> , permission: "loan-view"},
 
 	
-	{ path: "/withdrawaladd", component: <MembershipWithdrawalForm /> , permission: "withdrawal-add"},
-	{ path: "/withdrawals", component: <Withdrawals /> , permission: "withdrawal-list"},
-	{ path: "/withdrawaledit/:id", component: <MembershipWithdrawalForm /> },
+	{ path: "/withdrawaladd", component: <MembershipWithdrawalForm /> , permission: "member-withdrawal"},
+	{ path: "/withdrawals", component: <Withdrawals /> , permission: "member-withdrawal"},
+	{ path: "/withdrawaledit/:id", component: <MembershipWithdrawalForm /> , permission: "member-withdrawal"},
 
 	{ path: "/interestrun", component: <InterestRun /> },
 
